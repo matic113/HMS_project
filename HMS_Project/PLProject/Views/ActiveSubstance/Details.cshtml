@@ -1,26 +1,25 @@
 ﻿@model ActiveSubstanceViewModel
 @{
-	ViewData["Title"] = "Details";
+    ViewData["Title"] = "Details";
 }
 <div class="container mt-5" style="min-height: 120vh">
-	<h1 class="page-title">Active Substance Details</h1>
+    <h1 class="page-title">Active Substance Details</h1>
 
-	<partial name="PartialViews/DetailsDeletePartial" model="@Model" />
+    <partial name="PartialViews/DetailsDeletePartial" model="@Model"/>
 
-	<div class="mt-3 d-flex justify-content-between">
-		<div class="edit-delete">
-			<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
-				<i class="fas fa-edit"></i> Edit
-			</a>
-			<a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
-				<i class="fas fa-trash"></i> Delete
-			</a>
-		</div>
-		<div class="back-to-list">
-			<a asp-action="Index" class="btn btn-secondary ms-2">
-				<i class="fas fa-arrow-left"></i> Back To List
-			</a>
-		</div>
-	</div>
+    <div class="mt-3 d-flex justify-content-between">
+        <div class="edit-delete">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Delete
+            </a>
+        </div>
+        <div class="back-to-list">
+            <a asp-action="Index" class="btn btn-secondary ms-2">
+                <i class="fas fa-arrow-left"></i> Back To List
+            </a>
+        </div>
+    </div>
 </div>
-	

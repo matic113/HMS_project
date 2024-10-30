@@ -7,18 +7,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PLProject.ViewModels.PrescriptionVM
+namespace PLProject.ViewModels.PrescriptionVM;
+
+public class PrescriptionViewModel
 {
-    public class PrescriptionViewModel
-    {
-		public int prescriptionId { get; set; }
-		public virtual List<PrescriptionItemDoctorVM> PrescriptionItems { get; set; } = new List<PrescriptionItemDoctorVM>();
+    public int prescriptionId { get; set; }
+    public virtual List<PrescriptionItemDoctorVM> PrescriptionItems { get; set; } = new();
 
-        // Custom validation to check if at least one item is added
-        public bool HasItems => PrescriptionItems != null && PrescriptionItems.Any();
+    // Custom validation to check if at least one item is added
+    public bool HasItems => PrescriptionItems != null && PrescriptionItems.Any();
 
-        public string? PharmacistUserId { get; set; }
-		public string DoctorUserId { get; set; } =null!;
-		public Patient? Patient { get; set; }
-	}
+    public string? PharmacistUserId { get; set; }
+    public string DoctorUserId { get; set; } = null!;
+    public Patient? Patient { get; set; }
 }

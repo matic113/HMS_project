@@ -1,14 +1,12 @@
 ﻿@model InvoiceViewModel
 @{
-	ViewData["Title"] = "Invoice Details";
+    ViewData["Title"] = "Invoice Details";
 }
 <div class="container mt-5">
-	<h1>Invoice Details</h1>
-	<br />
+    <h1>Invoice Details</h1>
+    <br/>
 
-	<partial name="PartialViews/DetailsDeleteInvoicePartial" model="@Model"></partial>
-	<partial name="_ButtonsInDetailsPartial" model="Model.Id" />
+    <partial name="PartialViews/DetailsDeleteInvoicePartial" model="@Model"></partial>
+    <partial name="_ButtonsInDetailsPartial" model="Model.Id"/>
 
 </div>
-
-

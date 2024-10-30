@@ -1,24 +1,24 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
 
 /* Define classes for fixed-width columns */
@@ -37,10 +37,11 @@ body {
 .equal-width-4 {
     width: 10%; /* Example width for delete column */
 }
+
 /*************************************************************************************************************************************/
 /*************************************************************************************************************************************/
 /*************************************************************************************************************************************/
- /*appointment style*/
+/*appointment style*/
 .clinic-list {
     list-style-type: none;
     padding: 0;
@@ -62,16 +63,16 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-    .clinic-link:hover {
-        background-color: #007bff;
-        color: white;
-    }
+.clinic-link:hover {
+    background-color: #007bff;
+    color: white;
+}
 
-    .clinic-link.active {
-        background-color: #007bff;
-        color: white;
-        font-weight: bold; /* Highlight active clinic with bold text */
-    }
+.clinic-link.active {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold; /* Highlight active clinic with bold text */
+}
 
 .month-navigation {
     margin-bottom: 20px;
@@ -80,24 +81,24 @@ body {
     align-items: center; /* Ensure buttons are vertically centered */
 }
 
-    .month-navigation a {
-        width: 140px; /* Fixed width for buttons */
-        text-align: center;
-        padding: 8px;
-        border-radius: 5px;
-        background-color: #007bff;
-        color: white;
-        text-decoration: none;
-        transition: background-color 0.3s ease;
-    }
+.month-navigation a {
+    width: 140px; /* Fixed width for buttons */
+    text-align: center;
+    padding: 8px;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
 
-        .month-navigation a:hover {
-            background-color: #0056b3; /* Darker hover state for buttons */
-        }
+.month-navigation a:hover {
+    background-color: #0056b3; /* Darker hover state for buttons */
+}
 
-    .month-navigation .invisible {
-        visibility: hidden;
-    }
+.month-navigation .invisible {
+    visibility: hidden;
+}
 
 .table {
     width: 100%;
@@ -106,10 +107,10 @@ body {
     border-collapse: collapse; /* Clean border look */
 }
 
-    .table th, .table td {
-        padding: 10px;
-        border: 1px solid #ddd;
-    }
+.table th, .table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+}
 
 .available {
     background-color: #d4edda;
@@ -117,37 +118,37 @@ body {
     transition: background-color 0.3s ease;
 }
 
-    .available:hover {
-        background-color: #c3e6cb; /* Lighter green on hover */
-    }
+.available:hover {
+    background-color: #c3e6cb; /* Lighter green on hover */
+}
 
 .unavailable {
     background-color: #ff7878;
     color: #6c757d;
 }
 
-    .unavailable:hover {
-        background-color: #ff6161; /* Slightly darker hover effect */
-    }
+.unavailable:hover {
+    background-color: #ff6161; /* Slightly darker hover effect */
+}
 
 .form-group {
     margin-top: 20px;
     text-align: center;
 }
 
-    .form-group button {
-        padding: 10px 20px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
+.form-group button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
 
-        .form-group button:hover {
-            background-color: #0056b3;
-        }
+.form-group button:hover {
+    background-color: #0056b3;
+}
 
 /*************************************************************************************************************************************/
 /*************************************************************************************************************************************/
@@ -161,8 +162,6 @@ body {
     text-align: center;
     margin-bottom: 0.5em;
 }
-
-
 
 
 /*************************************************************************************************************************************/
@@ -603,8 +602,7 @@ ul {
 }
 
 .cover .book-box .options select,
-.cover .book-box .options button
-{
+.cover .book-box .options button {
     height: 65px;
 }
 

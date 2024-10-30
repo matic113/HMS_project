@@ -10,92 +10,97 @@ using NuGet.Protocol.Core.Types;
 using DALProject.model;
 using DALProject.DbInitializer;
 
-namespace PLProject
+namespace PLProject;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
+        var builder = WebApplication.CreateBuilder(args);
+
+        // Add services to the container.
+        builder.Services.AddControllersWithViews();
+        builder.Services.AddRazorPages();
+
+        #region DbContext
+
+        builder.Services.AddDbContext<HMSdbcontext>(options =>
         {
-            var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
-            builder.Services.AddControllersWithViews();
-            builder.Services.AddRazorPages();
-
-            #region DbContext
-            builder.Services.AddDbContext<HMSdbcontext>(options =>
-            {
-                options
+            options
                 .UseLazyLoadingProxies()
                 .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-            });
-            #endregion
+        });
 
-            #region Identity
-            builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+        #endregion
+
+        #region Identity
+
+        builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
                 options.User.RequireUniqueEmail = true
             )
-                .AddEntityFrameworkStores<HMSdbcontext>()
-                .AddDefaultTokenProviders();
+            .AddEntityFrameworkStores<HMSdbcontext>()
+            .AddDefaultTokenProviders();
 
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            // Configure the cookie settings used for authentication middleware.
-            builder.Services.ConfigureApplicationCookie(options =>
-            {
-                options.LoginPath = "/Identity/Account/Login";
-                options.LogoutPath = "/Identity/Account/Logout";
-                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-            });
-            #endregion
+        // Configure the cookie settings used for authentication middleware.
+        builder.Services.ConfigureApplicationCookie(options =>
+        {
+            options.LoginPath = "/Identity/Account/Login";
+            options.LogoutPath = "/Identity/Account/Logout";
+            options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+        });
 
-            builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-            builder.Services.AddScoped<IDbInitializer, DbInitializer>();
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-            builder.Services.AddScoped<IEmailSender, EmailSender>();
-            builder.Services.AddScoped<HMSdbcontextProcedures>();
+        #endregion
 
-            var app = builder.Build();
+        builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+        builder.Services.AddScoped<IEmailSender, EmailSender>();
+        builder.Services.AddScoped<HMSdbcontextProcedures>();
 
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
+        var app = builder.Build();
 
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-
-            app.UseRouting();
-
-            // Always add authentication before authorization
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.MapRazorPages();
-
-            app.MapControllerRoute(
-                name: "areas",
-                pattern: "{area:exists}/{controller=Home}/{action=Index}/{userId?}");   
-
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
-
-            #region Update and Initialize Database
-            // Applies pending migrations also if there are no roles, create the default
-            // admin user with email = admin@hmsproject.com and password = Admin#123 you can also use username = admin
-
-            using (var scope = app.Services.CreateScope())
-            {
-                var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
-                dbInitializer.Initialize();
-            }
-            #endregion
-
-            app.Run();
+        // Configure the HTTP request pipeline.
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseExceptionHandler("/Home/Error");
+            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+            app.UseHsts();
         }
+
+        app.UseHttpsRedirection();
+        app.UseStaticFiles();
+
+        app.UseRouting();
+
+        // Always add authentication before authorization
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.MapRazorPages();
+
+        app.MapControllerRoute(
+            "areas",
+            "{area:exists}/{controller=Home}/{action=Index}/{userId?}");
+
+        app.MapControllerRoute(
+            "default",
+            "{controller=Home}/{action=Index}/{id?}");
+
+        #region Update and Initialize Database
+
+        // Applies pending migrations also if there are no roles, create the default
+        // admin user with email = admin@hmsproject.com and password = Admin#123 you can also use username = admin
+
+        using (var scope = app.Services.CreateScope())
+        {
+            var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+            dbInitializer.Initialize();
+        }
+
+        #endregion
+
+        app.Run();
     }
 }

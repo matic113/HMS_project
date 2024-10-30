@@ -3,99 +3,96 @@
 @inject IUnitOfWork unitOfWork
 
 @{
-	ViewData["Title"] = "Edit Active Substance";
+    ViewData["Title"] = "Edit Active Substance";
 
-	// Fetch the Active Substances that can be used in the dropdown, excluding the ones already in interactions
-	var spec = new BaseSpecification<ActiveSubstance>(a => !Model.Interactions.Select(i => i.ActSubId).Contains(a.Id));
-	var ActiveSubstancesDataReader = unitOfWork.Repository<ActiveSubstance>().GetALLWithSpec(spec).ToList();
-	
-	var Medspec = new BaseSpecification<Medication>(a => !Model.Medications.Select(i => i.Id).Contains(a.Id));
-	var MedicationsDateReader = unitOfWork.Repository<Medication>().GetALLWithSpec(Medspec).ToList();
+    // Fetch the Active Substances that can be used in the dropdown, excluding the ones already in interactions
+    var spec = new BaseSpecification<ActiveSubstance>(a => !Model.Interactions.Select(i => i.ActSubId).Contains(a.Id));
+    var ActiveSubstancesDataReader = unitOfWork.Repository<ActiveSubstance>().GetALLWithSpec(spec).ToList();
 
-
-
+    var Medspec = new BaseSpecification<Medication>(a => !Model.Medications.Select(i => i.Id).Contains(a.Id));
+    var MedicationsDateReader = unitOfWork.Repository<Medication>().GetALLWithSpec(Medspec).ToList();
 }
 
 <div class="container mt-5" style="min-height: 100vh">
-	<!-- Error Message -->
-	<partial name="ErrorMessage" />
-	<h1 class="page-title">Edit Active Substance</h1>
+    <!-- Error Message -->
+    <partial name="ErrorMessage"/>
+    <h1 class="page-title">Edit Active Substance</h1>
 
-	<!-- Main form for editing the active substance and its interactions -->
-	<form id="editForm" asp-action="Edit" method="post">
-		<!-- Active Substance Name -->
-		<div>
-			<label asp-for="ActiveSubstancesName" class="form-label"></label>
-			<input asp-for="ActiveSubstancesName" class="form-control" />
-			<span asp-validation-for="ActiveSubstancesName" class="text-danger"></span>
-		</div>
+    <!-- Main form for editing the active substance and its interactions -->
+    <form id="editForm" asp-action="Edit" method="post">
+        <!-- Active Substance Name -->
+        <div>
+            <label asp-for="ActiveSubstancesName" class="form-label"></label>
+            <input asp-for="ActiveSubstancesName" class="form-control"/>
+            <span asp-validation-for="ActiveSubstancesName" class="text-danger"></span>
+        </div>
 
-		<!-- Add new Medications (optional) -->
-		<div class="mt-3">
-			<label asp-for="MedicationId" class="form-label">Add new Medications (optional):</label>
-			<select asp-for="MedicationId" class="form-control select2-multiple">
-				@foreach (var medication in MedicationsDateReader)
-				{
-					<option value="@medication.Id">@medication.MedName</option>
-				}
-			</select>
-		</div>
+        <!-- Add new Medications (optional) -->
+        <div class="mt-3">
+            <label asp-for="MedicationId" class="form-label">Add new Medications (optional):</label>
+            <select asp-for="MedicationId" class="form-control select2-multiple">
+                @foreach (var medication in MedicationsDateReader)
+                {
+                    <option value="@medication.Id">@medication.MedName</option>
+                }
+            </select>
+        </div>
 
-		<!-- Interactions with Other Substances -->
-		<div class="mt-3">
-			<h6 class="mb-3">Interactions with Other Active Substances</h6>
-			<div>
-				<div id="interactions-list" class="row gy-3">
-					@for (int i = 0; i < Model.Interactions.Count; i++)
-					{
-						<div class="interaction-item col-md-12 row align-items-end mb-3 mt-3" id="Interaction_@Model.Interactions[i].ActSubId">
-							<!-- Substance Selector -->
-							<div class="col-md-6">
-								<label class="form-label">Substance</label>
-								<select name="Interactions[@i].ActSubId" class="form-control" required>
-									<option value="">Select Substance</option>
-									@foreach (var substance in ActiveSubstancesDataReader)
-									{
-										<option value="@substance.Id" >
-											@substance.ActiveSubstancesName
-										</option>
-									}
-								</select>
-							</div>
+        <!-- Interactions with Other Substances -->
+        <div class="mt-3">
+            <h6 class="mb-3">Interactions with Other Active Substances</h6>
+            <div>
+                <div id="interactions-list" class="row gy-3">
+                    @for (var i = 0; i < Model.Interactions.Count; i++)
+                    {
+                        <div class="interaction-item col-md-12 row align-items-end mb-3 mt-3" id="Interaction_@Model.Interactions[i].ActSubId">
+                            <!-- Substance Selector -->
+                            <div class="col-md-6">
+                                <label class="form-label">Substance</label>
+                                <select name="Interactions[@i].ActSubId" class="form-control" required>
+                                    <option value="">Select Substance</option>
+                                    @foreach (var substance in ActiveSubstancesDataReader)
+                                    {
+                                        <option value="@substance.Id">
+                                            @substance.ActiveSubstancesName
+                                        </option>
+                                    }
+                                </select>
+                            </div>
 
-							<!-- Interaction Input -->
-							<div class="col-md-4">
-								<label class="fw-bold">Interaction</label>
-								<input type="text" name="Interactions[@i].Interaction" value="@Model.Interactions[i].Interaction" class="form-control" placeholder="Enter interaction" required />
-							</div>
+                            <!-- Interaction Input -->
+                            <div class="col-md-4">
+                                <label class="fw-bold">Interaction</label>
+                                <input type="text" name="Interactions[@i].Interaction" value="@Model.Interactions[i].Interaction" class="form-control" placeholder="Enter interaction" required/>
+                            </div>
 
-							<!-- Delete Button with Modal Confirmation -->
-							<div class="col-md-2 d-flex align-items-center">
-								<button type="button" class="btn btn-danger delete-interaction" data-interaction-id="@Model.Interactions[i].ActSubId">
-									<i class="fas fa-trash-alt"></i> Delete
-								</button>
-							</div>
-						</div>
-					}
-				</div>
+                            <!-- Delete Button with Modal Confirmation -->
+                            <div class="col-md-2 d-flex align-items-center">
+                                <button type="button" class="btn btn-danger delete-interaction" data-interaction-id="@Model.Interactions[i].ActSubId">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
 
-				<!-- Add New Interaction Button -->
-				<button type="button" class="btn btn-success mt-3" id="add-interaction">
-					<i class="fas fa-plus-circle"></i> Add Interaction
-				</button>
-			</div>
-		</div>
+                <!-- Add New Interaction Button -->
+                <button type="button" class="btn btn-success mt-3" id="add-interaction">
+                    <i class="fas fa-plus-circle"></i> Add Interaction
+                </button>
+            </div>
+        </div>
 
-		<!-- Submit Button -->
-		<div class="mt-3 d-flex justify-content-between">
-			<button type="submit" class="btn btn-primary">
-				<i class="fas fa-edit"></i> Save Changes
-			</button>
-			<a asp-controller="ActiveSubstance" asp-action="Index" class="btn btn-secondary ms-2">
-				<i class="fas fa-arrow-left"></i> Back To List
-			</a>
-		</div>
-	</form>
+        <!-- Submit Button -->
+        <div class="mt-3 d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Save Changes
+            </button>
+            <a asp-controller="ActiveSubstance" asp-action="Index" class="btn btn-secondary ms-2">
+                <i class="fas fa-arrow-left"></i> Back To List
+            </a>
+        </div>
+    </form>
 </div>
 
 
@@ -108,12 +105,12 @@
             }, 5000); // 5000 ms = 5 seconds
         });
     </script>
-	@await Html.PartialAsync("_ValidationScriptsPartial")
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script src="~/select2/js/select2.min.js"></script>
-	<link href="~/select2/css/select2.min.css" rel="stylesheet" />
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/select2/js/select2.min.js"></script>
+    <link href="~/select2/css/select2.min.css" rel="stylesheet"/>
 
-	<script>
+    <script>
 		$(document).ready(function () {
 			// Initialize Select2 for Medication field
 			$('.select2-multiple').select2({
@@ -132,9 +129,9 @@
 							<select name="Interactions[` + index + `].ActSubId" class="form-control" required>
 								<option value="">Select Substance</option>
 								@foreach (var substance in ActiveSubstancesDataReader)
-								{
-									<option value="@substance.Id">@substance.ActiveSubstancesName</option>
-								}
+                                {
+                                    <option value="@substance.Id">@substance.ActiveSubstancesName</option>
+                                }
 							</select>
 						</div>
 						<div class="col-md-4">

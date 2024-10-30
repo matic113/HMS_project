@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace PLProject.Controllers
+namespace PLProject.Controllers;
+
+public class GuestController : Controller
 {
-    public class GuestController : Controller
+    public IActionResult Index()
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
+        return View();
     }
 }

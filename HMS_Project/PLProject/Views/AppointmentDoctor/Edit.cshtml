@@ -8,7 +8,7 @@
 
 <div class="container mt-5" style="min-height: 100vh">
     <!-- Error Message -->
-    <partial name="ErrorMessage" />
+    <partial name="ErrorMessage"/>
     <!-- Header Section -->
     <h1 class="page-title">Edit Appointment</h1>
 
@@ -22,10 +22,14 @@
             <div class="card-body">
                 <div class="row text-center">
                     <div class="col-md-6">
-                        <p><strong>Date:</strong> @Model.ApointmentDate.ToString("dd MMM yyyy")</p>
+                        <p>
+                            <strong>Date:</strong> @Model.ApointmentDate.ToString("dd MMM yyyy")
+                        </p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Patient Name:</strong> @Model.Patient.AppUser.FullName</p>
+                        <p>
+                            <strong>Patient Name:</strong> @Model.Patient.AppUser.FullName
+                        </p>
                     </div>
                 </div>
             </div>
@@ -43,8 +47,8 @@
 
                     </div>
 
-                    <input asp-for="Id" type="hidden" />
-                    
+                    <input asp-for="Id" type="hidden"/>
+
 
                     <!-- Prescription Section -->
                     <div id="prescriptionItemsSection" class="mt-4" style="display: none;">
@@ -105,7 +109,7 @@
                                 <option value="">Select Active Substance...</option>
         @foreach (var substance in SubstanceList)
         {
-                                        <option value="@substance.Id">@substance.ActiveSubstancesName</option>
+            <option value="@substance.Id">@substance.ActiveSubstancesName</option>
         }
                             </select>
                         </div>

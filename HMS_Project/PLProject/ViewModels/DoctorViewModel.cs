@@ -5,7 +5,9 @@ using Project.ViewModels;
 
 public class DoctorViewModel : UserViewModel
 {
-    public DoctorViewModel() { }
+    public DoctorViewModel()
+    {
+    }
 
     public DoctorViewModel(Doctor doctor)
     {
@@ -27,6 +29,7 @@ public class DoctorViewModel : UserViewModel
             FirstName = name[0];
             LastName = name[1];
         }
+
         Clinic = doctor.Clinic;
         DateOfBirth = doctor.AppUser.DateOfBirth;
         Phone = doctor.AppUser.PhoneNumber;
@@ -42,7 +45,7 @@ public class DoctorViewModel : UserViewModel
     public int? specializationId { get; set; }
     public Clinic? Clinic { get; set; }
     public decimal? Price { get; set; } // إضافة خاصية Price إذا كانت مطلوبة
-    public List<DoctorScheduleVM>? schedule { get; set; } = new List<DoctorScheduleVM>();
+    public List<DoctorScheduleVM>? schedule { get; set; } = new();
 
     public static explicit operator Doctor(DoctorViewModel doctorViewModel)
     {
@@ -53,7 +56,8 @@ public class DoctorViewModel : UserViewModel
         doctor.AppUser.Address = doctorViewModel.Address;
         doctor.AppUser.Gender = doctorViewModel.Gender;
         doctor.AppUser.PhoneNumber = doctorViewModel.Phone;
-        doctor.AppUser.FullName = $"{doctorViewModel.FirstName.Trim()} {doctorViewModel.MiddleName.Trim()} {doctorViewModel.LastName.Trim()}";
+        doctor.AppUser.FullName =
+            $"{doctorViewModel.FirstName.Trim()} {doctorViewModel.MiddleName.Trim()} {doctorViewModel.LastName.Trim()}";
         doctor.AppUser.DateOfBirth = doctorViewModel.DateOfBirth;
         doctor.SpecializationId = doctorViewModel.specializationId ?? 0;
         doctor.Clinic = doctorViewModel.Clinic;

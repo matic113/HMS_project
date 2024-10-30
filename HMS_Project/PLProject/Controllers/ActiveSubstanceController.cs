@@ -14,202 +14,200 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 [Authorize(Roles = $"{Roles.Admin}, {Roles.Pharmacist}")]
 public class ActiveSubstanceController : Controller
 {
-	#region DPI
+    #region DPI
 
-	private readonly IWebHostEnvironment env;
-	private readonly HMSdbcontextProcedures procedures;
-	private readonly IUnitOfWork unitOfWork;
+    private readonly IWebHostEnvironment env;
+    private readonly HMSdbcontextProcedures procedures;
+    private readonly IUnitOfWork unitOfWork;
 
-	public ActiveSubstanceController(IWebHostEnvironment _env, HMSdbcontextProcedures procedures, IUnitOfWork unitOfWork)
-	{
+    public ActiveSubstanceController(IWebHostEnvironment _env, HMSdbcontextProcedures procedures,
+        IUnitOfWork unitOfWork)
+    {
+        env = _env;
+        this.procedures = procedures;
+        this.unitOfWork = unitOfWork;
+    }
 
-		env = _env;
-		this.procedures = procedures;
-		this.unitOfWork = unitOfWork;
+    #endregion
 
-	}
+    #region Index
 
-	#endregion
+    public IActionResult Index(string searchQuery, int? page)
+    {
+        IEnumerable<ActiveSubstance> susbstances;
+        // Filter by ActiveSubstanceName (if provided)
+        if (!string.IsNullOrEmpty(searchQuery))
+            susbstances = unitOfWork.Repository<ActiveSubstance>()
+                .Find(s => s.ActiveSubstancesName.ToUpper().Contains(searchQuery.ToUpper())).AsNoTracking().ToList();
+        else
+            // Fetch all ActiveSubstance entries
+            susbstances = unitOfWork.Repository<ActiveSubstance>().GetALL();
 
-	#region Index
-	public IActionResult Index(string searchQuery, int? page)
-	{
+        // Map ActiveSubstance to ActiveSubstanceViewModel
+        var ActSubVM = susbstances.Select(a => (ActiveSubstanceViewModel)a).ToList();
+        // Pagination logic
+        var pageSize = 10;
+        var pageNumber = page ?? 1;
 
-		IEnumerable<ActiveSubstance> susbstances;
-		// Filter by ActiveSubstanceName (if provided)
-		if (!string.IsNullOrEmpty(searchQuery))
-		{
-			susbstances = unitOfWork.Repository<ActiveSubstance>().Find(s => s.ActiveSubstancesName.ToUpper().Contains(searchQuery.ToUpper())).AsNoTracking().ToList();
-		}
-		else
-		{
-			// Fetch all ActiveSubstance entries
+        ViewData["CurrentFilter"] = searchQuery;
+        var paginatedList = ActSubVM.ToPagedList(pageNumber, pageSize);
 
-			susbstances = unitOfWork.Repository<ActiveSubstance>().GetALL();
-		}
+        return View(paginatedList);
+    }
 
-		// Map ActiveSubstance to ActiveSubstanceViewModel
-		var ActSubVM = susbstances.Select(a => (ActiveSubstanceViewModel)a).ToList();
-		// Pagination logic
-		int pageSize = 10;
-		int pageNumber = page ?? 1;
+    #endregion
 
-		ViewData["CurrentFilter"] = searchQuery;
-		var paginatedList = ActSubVM.ToPagedList(pageNumber, pageSize);
+    #region Create
 
-		return View(paginatedList);
-	}
-	#endregion
+    public IActionResult Create()
+    {
+        return View();
+    }
 
-	#region Create
-	public IActionResult Create()
-	{
-		return View();
-	}
+    // POST: Handle form submission
+    [HttpPost]
+    public IActionResult Create(ActiveSubstanceViewModel ViewModel)
+    {
+        foreach (var MedId in ViewModel.MedicationId)
+            ViewModel.Medications.Add(unitOfWork.Repository<Medication>().Get(MedId));
+        if (ModelState.IsValid)
+            try
+            {
+                unitOfWork.Repository<ActiveSubstance>().Add((ActiveSubstance)ViewModel);
+                unitOfWork.Complete();
+                // Set a success message using TempData
+                TempData["SuccessMessage"] = "Active substance Created  successfully!";
 
-	// POST: Handle form submission
-	[HttpPost]
-	public IActionResult Create(ActiveSubstanceViewModel ViewModel)
-	{
-		foreach (var MedId in ViewModel.MedicationId)
-		{
-			ViewModel.Medications.Add(unitOfWork.Repository<Medication>().Get(MedId));
-		}
-		if (ModelState.IsValid)
-		{
-			try
-			{
-				unitOfWork.Repository<ActiveSubstance>().Add((ActiveSubstance)ViewModel);
-				unitOfWork.Complete();
-				// Set a success message using TempData
-				TempData["SuccessMessage"] = "Active substance Created  successfully!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                if (env.IsDevelopment())
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                else
+                    // Set an error message using TempData
+                    TempData["ErrorMessage"] = "An Error Has Occurred during Createing Active substance.";
+                return View(ViewModel);
+            }
 
-				return RedirectToAction(nameof(Index));
-			}
-			catch (Exception ex)
-			{
-				if (env.IsDevelopment())
-					ModelState.AddModelError(string.Empty, ex.Message);
-				else
-					// Set an error message using TempData
-					TempData["ErrorMessage"] = "An Error Has Occurred during Createing Active substance.";
-				return View(ViewModel);
-			}
-		}
-		return View(ViewModel);
-	}
+        return View(ViewModel);
+    }
 
-	// Success action
-	public IActionResult Success()
-	{
-		return View();
-	}
-	#endregion
+    // Success action
+    public IActionResult Success()
+    {
+        return View();
+    }
 
-	#region Details
-	public IActionResult Details(int? Id, string viewname = "Details")
-	{
-		if (!Id.HasValue)
-			return BadRequest(); // 400
-		var substandce = unitOfWork.Repository<ActiveSubstance>().Get(Id.Value);
-		var substancevm = (ActiveSubstanceViewModel)substandce;
+    #endregion
 
-		if (substancevm is null)
-			return NotFound(); // 404
-		return View(viewname, substancevm);
-	}
-	#endregion
+    #region Details
 
-	#region Delete
-	public IActionResult Delete(int? Id)
-	{
-		return Details(Id, "Delete");
-	}
+    public IActionResult Details(int? Id, string viewname = "Details")
+    {
+        if (!Id.HasValue)
+            return BadRequest(); // 400
+        var substandce = unitOfWork.Repository<ActiveSubstance>().Get(Id.Value);
+        var substancevm = (ActiveSubstanceViewModel)substandce;
 
-	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<ActionResult> Delete([FromRoute] int Id, ActiveSubstanceViewModel viewModel)
-	{
-		if (Id != viewModel.Id)
-			return BadRequest();//400
-		try
-		{
+        if (substancevm is null)
+            return NotFound(); // 404
+        return View(viewname, substancevm);
+    }
 
-			await procedures.sp_DeleteActiveSubstanceAsync(viewModel.Id);
+    #endregion
 
-			// Set a success message using TempData
-			TempData["SuccessMessage"] = "Active Substance delete successfully!";
+    #region Delete
 
-			return RedirectToAction(nameof(Index));
-		}
-		catch (Exception ex)
-		{
+    public IActionResult Delete(int? Id)
+    {
+        return Details(Id, "Delete");
+    }
 
-			if (env.IsDevelopment())
-				ModelState.AddModelError(string.Empty, ex.Message);
-			else
-				ModelState.AddModelError(string.Empty, "An Error Has Occurred during Deleting the Active Substance");
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> Delete([FromRoute] int Id, ActiveSubstanceViewModel viewModel)
+    {
+        if (Id != viewModel.Id)
+            return BadRequest(); //400
+        try
+        {
+            await procedures.sp_DeleteActiveSubstanceAsync(viewModel.Id);
 
-			return View(viewModel);
-		}
-	}
-	#endregion
+            // Set a success message using TempData
+            TempData["SuccessMessage"] = "Active Substance delete successfully!";
 
-	#region Edit
-	public IActionResult Edit(int? Id)
-	{
-		return Details(Id, "Edit");
-	}
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            if (env.IsDevelopment())
+                ModelState.AddModelError(string.Empty, ex.Message);
+            else
+                ModelState.AddModelError(string.Empty, "An Error Has Occurred during Deleting the Active Substance");
 
-	[HttpPost, ValidateAntiForgeryToken]
-	public IActionResult Edit([FromRoute] int Id, ActiveSubstanceViewModel viewModel)
-	{
+            return View(viewModel);
+        }
+    }
 
-		if (Id != viewModel.Id)
-			return BadRequest();//400
-								// Add medications associated with the substance
-		viewModel.Medications.AddRange(unitOfWork.Repository<Medication>().Find(x => viewModel.MedicationId.Contains(x.Id)));
-		unitOfWork.Complete();
+    #endregion
 
-		// Get the active substance from the repository
-		var activeSubstance = unitOfWork.Repository<ActiveSubstance>().Get(viewModel.Id);
+    #region Edit
 
-		// Add New medication to the active substance
-		activeSubstance.Medications.AddRange(viewModel.Medications);
-		unitOfWork.Complete();
-		// Add New interactions to the active substance
-		activeSubstance.ActSub1.AddRange(((ActiveSubstance)viewModel).ActSub1);
-		unitOfWork.Complete();
-		activeSubstance.ActiveSubstancesName = viewModel.ActiveSubstancesName;
+    public IActionResult Edit(int? Id)
+    {
+        return Details(Id, "Edit");
+    }
 
-		// If the model is invalid, repopulate lists and return the view
-		if (!ModelState.IsValid)
-		{
-			return View(viewModel);
-		}
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Edit([FromRoute] int Id, ActiveSubstanceViewModel viewModel)
+    {
+        if (Id != viewModel.Id)
+            return BadRequest(); //400
+        // Add medications associated with the substance
+        viewModel.Medications.AddRange(unitOfWork.Repository<Medication>()
+            .Find(x => viewModel.MedicationId.Contains(x.Id)));
+        unitOfWork.Complete();
 
-		try
-		{
-			// Update the active substance in the repository
-			unitOfWork.Repository<ActiveSubstance>().Update(activeSubstance);
-			unitOfWork.Complete();
+        // Get the active substance from the repository
+        var activeSubstance = unitOfWork.Repository<ActiveSubstance>().Get(viewModel.Id);
 
-			// Set a success message using TempData
-			TempData["SuccessMessage"] = "Active Substance update successfully!";
+        // Add New medication to the active substance
+        activeSubstance.Medications.AddRange(viewModel.Medications);
+        unitOfWork.Complete();
+        // Add New interactions to the active substance
+        activeSubstance.ActSub1.AddRange(((ActiveSubstance)viewModel).ActSub1);
+        unitOfWork.Complete();
+        activeSubstance.ActiveSubstancesName = viewModel.ActiveSubstancesName;
 
-			return RedirectToAction(nameof(Index));
-		}
-		catch (Exception ex)
-		{
-			// Handle exceptions and add error messages to the model state
+        // If the model is invalid, repopulate lists and return the view
+        if (!ModelState.IsValid) return View(viewModel);
 
-			if (env.IsDevelopment())
-				ModelState.AddModelError(string.Empty, ex.Message);
-			else
-				// Set an error message using TempData
-				TempData["ErrorMessage"] = "An Error Has Occurred during the update.";
+        try
+        {
+            // Update the active substance in the repository
+            unitOfWork.Repository<ActiveSubstance>().Update(activeSubstance);
+            unitOfWork.Complete();
 
-			return View(viewModel);
-		}
-	}
-	#endregion
+            // Set a success message using TempData
+            TempData["SuccessMessage"] = "Active Substance update successfully!";
+
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions and add error messages to the model state
+
+            if (env.IsDevelopment())
+                ModelState.AddModelError(string.Empty, ex.Message);
+            else
+                // Set an error message using TempData
+                TempData["ErrorMessage"] = "An Error Has Occurred during the update.";
+
+            return View(viewModel);
+        }
+    }
+
+    #endregion
 }

@@ -11,7 +11,7 @@
 <div class="container mt-5">
 
     <!-- Error Message -->
-    <partial name="ErrorMessage" />
+    <partial name="ErrorMessage"/>
 
     <!-- Page Header -->
     <h1 class="text-center mb-4">Edit Prescription</h1>
@@ -23,7 +23,7 @@
     <!-- Prescription Form -->
     <form asp-action="Edit" method="post" class="row g-4">
         <!-- Hidden Fields -->
-        <input asp-for="prescriptionId" hidden />
+        <input asp-for="prescriptionId" hidden/>
 
         <!-- Prescription Items Section -->
         <div class="col-12">
@@ -35,23 +35,23 @@
                     <div id="itemsContainer">
                         @for (i = 0; i < Model.PrescriptionItems.Count; i++)
                         {
-                            <input asp-for="PrescriptionItems[i].ActiveSubstanceId" hidden />
+                            <input asp-for="PrescriptionItems[i].ActiveSubstanceId" hidden/>
                             <!-- Prescription Item Row -->
                             <div class="row mb-3 item-row border-bottom pb-3" data-index="@i">
                                 <div class="col-md-4">
                                     <label asp-for="PrescriptionItems[i].ActiveSubstance.ActiveSubstancesName" class="form-label fw-bold">Active Substance</label>
-                                    <input asp-for="PrescriptionItems[i].ActiveSubstance.ActiveSubstancesName" class="form-control-plaintext ps-1" readonly />
+                                    <input asp-for="PrescriptionItems[i].ActiveSubstance.ActiveSubstancesName" class="form-control-plaintext ps-1" readonly/>
                                 </div>
                                 <div class="col-md-4">
                                     <label asp-for="PrescriptionItems[i].FullDosage" class="form-label fw-bold">Dosage</label>
-                                    <input asp-for="PrescriptionItems[i].FullDosage" class="form-control-plaintext ps-1" readonly />
+                                    <input asp-for="PrescriptionItems[i].FullDosage" class="form-control-plaintext ps-1" readonly/>
                                 </div>
                             </div>
 
                             <!-- Medications Section for Each Item -->
                             <div class="medications-container mb-4" data-prescription-index="@i">
                                 <h5 class="text-secondary mb-3">Medications</h5>
-                                @for (int j = 0; j < Model.PrescriptionItems[i].Medications?.Count; j++)
+                                @for (var j = 0; j < Model.PrescriptionItems[i].Medications?.Count; j++)
                                 {
                                     <div class="row mb-3 medication-row" data-medication-index="@j">
                                         <div class="col-md-4">
@@ -66,11 +66,11 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label asp-for="PrescriptionItems[i].Medications[j].Dosage" class="form-label fw-bold">Dosage</label>
-                                            <input asp-for="PrescriptionItems[i].Medications[j].Dosage" class="form-control" placeholder="Enter dosage" />
+                                            <input asp-for="PrescriptionItems[i].Medications[j].Dosage" class="form-control" placeholder="Enter dosage"/>
                                         </div>
                                         <div class="col-md-3">
                                             <label asp-for="PrescriptionItems[i].Medications[j].Duration" class="form-label fw-bold">Duration (days)</label>
-                                            <input asp-for="PrescriptionItems[i].Medications[j].Duration" class="form-control" placeholder="Enter duration" />
+                                            <input asp-for="PrescriptionItems[i].Medications[j].Duration" class="form-control" placeholder="Enter duration"/>
                                         </div>
                                         <div class="col-md-2 d-flex align-items-end">
                                             <!-- Remove Medication Button -->
@@ -102,6 +102,7 @@
 </div>
 
 <!-- Custom Scripts Section -->
+
 @section Scripts {
     <script>
         // Automatically hide the error message after 5 seconds (5000 milliseconds)

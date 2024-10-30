@@ -1,13 +1,13 @@
 ﻿@model PharmacistViewModel
 @{
-	ViewData["Title"] = "Pharmacist Details";
+    ViewData["Title"] = "Pharmacist Details";
 }
 <div class="container mt-5" style="min-height: 120vh">
-	<h1 class="page-title">Pharmacist Details</h1>
+    <h1 class="page-title">Pharmacist Details</h1>
 
-	<div>
-		<partial name="userpartialviews\_UserDetailsDeletePartial" model="@Model" />
+    <div>
+        <partial name="userpartialviews\_UserDetailsDeletePartial" model="@Model"/>
 
-		<partial name="_ButtonsInDetailsPartial" model="Model.UserId" />
-	</div>
+        <partial name="_ButtonsInDetailsPartial" model="Model.UserId"/>
+    </div>
 </div>

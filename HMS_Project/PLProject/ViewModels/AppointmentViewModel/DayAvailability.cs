@@ -1,11 +1,10 @@
 ﻿using DALProject.model;
 
-namespace PLProject.ViewModels.AppointmentViewModel
+namespace PLProject.ViewModels.AppointmentViewModel;
+
+public class DayAvailability
 {
-    public class DayAvailability
-    {
-        public DateTime Date { get; set; }
-        public bool IsAvailable { get; set; } = false;
-        public List<DoctorScheduleLookup>? AvailableDoctors { get; set; }
-    }
+    public DateTime Date { get; set; }
+    public bool IsAvailable { get; set; } = false;
+    public List<DoctorScheduleLookup>? AvailableDoctors { get; set; }
 }

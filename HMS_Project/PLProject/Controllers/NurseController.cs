@@ -5,104 +5,108 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Numerics;
 
-namespace PLProject.Controllers
+namespace PLProject.Controllers;
+
+public class NurseController : Controller
 {
-	public class NurseController : Controller
-	{
-		#region DPI
-		private readonly IUnitOfWork unitOfWork;
-		private readonly IWebHostEnvironment env;
+    #region DPI
 
-		public NurseController(IUnitOfWork unitOfWork, IWebHostEnvironment _env)
-		{
-			this.unitOfWork = unitOfWork;
-			env = _env;
-		}
-		#endregion
+    private readonly IUnitOfWork unitOfWork;
+    private readonly IWebHostEnvironment env;
 
-		#region Index 
-		[Authorize(Roles = Roles.Admin)]
-		public IActionResult Index()
-		{
-			var Nurses = unitOfWork.Repository<Nurse>().GetALL();
-			var NurseViewModels = Nurses.Select(p => (NurseViewModel)p).ToList();
-			return View(NurseViewModels);
-		}
-		#endregion
+    public NurseController(IUnitOfWork unitOfWork, IWebHostEnvironment _env)
+    {
+        this.unitOfWork = unitOfWork;
+        env = _env;
+    }
 
-		#region Details
-		[Authorize(Roles = Roles.Admin + "," + Roles.Nurse)]  // Admins can edit all, doctors can edit their own profile
-		[Route("Nurse/Details/{userId}")]
-		public IActionResult Details(string userId)
-		{
-			if (userId is null)
-				return BadRequest(); // 400
+    #endregion
 
-			var Nurse = unitOfWork.Repository<Nurse>().Get(userId);
+    #region Index
 
-			if (Nurse is null)
-				return NotFound(); // 404
+    [Authorize(Roles = Roles.Admin)]
+    public IActionResult Index()
+    {
+        var Nurses = unitOfWork.Repository<Nurse>().GetALL();
+        var NurseViewModels = Nurses.Select(p => (NurseViewModel)p).ToList();
+        return View(NurseViewModels);
+    }
 
-			var NurseViewModel = (NurseViewModel)Nurse;
-			if (User.IsInRole(Roles.Nurse))
-				return RedirectToAction(nameof(Index), controllerName: "Home");
-			else
-				return View(NurseViewModel);
-		}
-		#endregion
+    #endregion
 
-		#region Edit
-		[Authorize(Roles = Roles.Admin + "," + Roles.Nurse)]  // Admins can edit all, doctors can edit their own profile
+    #region Details
 
-		[Route("Nurse/Edit/{userId}")]
-		public IActionResult Edit(string userId)
-		{
-			if (userId is null)
-				return BadRequest(); // 400
+    [Authorize(Roles = Roles.Admin + "," + Roles.Nurse)] // Admins can edit all, doctors can edit their own profile
+    [Route("Nurse/Details/{userId}")]
+    public IActionResult Details(string userId)
+    {
+        if (userId is null)
+            return BadRequest(); // 400
 
-			var Nurse = unitOfWork.Repository<Nurse>().Get(userId);
+        var Nurse = unitOfWork.Repository<Nurse>().Get(userId);
 
-			if (Nurse is null)
-				return NotFound(); // 404
+        if (Nurse is null)
+            return NotFound(); // 404
 
-			var NurseViewModel = (NurseViewModel)Nurse;
-			return View(NurseViewModel);
-		}
+        var NurseViewModel = (NurseViewModel)Nurse;
+        if (User.IsInRole(Roles.Nurse))
+            return RedirectToAction(nameof(Index), "Home");
+        else
+            return View(NurseViewModel);
+    }
 
-		[HttpPost, ValidateAntiForgeryToken]
-		[Route("Nurse/Edit/{userId}")]
-		public IActionResult Edit([FromRoute] string userId, NurseViewModel ViewModel)
-		{
+    #endregion
 
-			if (userId != ViewModel.UserId)
-				return BadRequest();//400
-			var nurse = unitOfWork.Repository<Nurse>().Get(ViewModel.UserId);
-			if (ModelState.IsValid)
-			{
-				try
-				{
-					nurse.UpdateInfo(ViewModel);
-					//unitOfWork.Repository<Doctor>().Update(doctor);
-					unitOfWork.Complete();
+    #region Edit
 
-					// Set a success message using TempData
-					TempData["SuccessMessage"] = "nurse update successfully!";
+    [Authorize(Roles = Roles.Admin + "," + Roles.Nurse)] // Admins can edit all, doctors can edit their own profile
+    [Route("Nurse/Edit/{userId}")]
+    public IActionResult Edit(string userId)
+    {
+        if (userId is null)
+            return BadRequest(); // 400
 
-					return RedirectToAction(nameof(Index));
-				}
-				catch (Exception ex)
-				{
-					if (env.IsDevelopment())
-						ModelState.AddModelError(string.Empty, ex.Message);
-					else
-						// Set an error message using TempData
-						TempData["ErrorMessage"] = "An Error Has Occurred during update nurse";
-					return View(ViewModel);
-				}
-			}
+        var Nurse = unitOfWork.Repository<Nurse>().Get(userId);
 
-			return View(ViewModel);
-		}
-		#endregion
-	}
+        if (Nurse is null)
+            return NotFound(); // 404
+
+        var NurseViewModel = (NurseViewModel)Nurse;
+        return View(NurseViewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Route("Nurse/Edit/{userId}")]
+    public IActionResult Edit([FromRoute] string userId, NurseViewModel ViewModel)
+    {
+        if (userId != ViewModel.UserId)
+            return BadRequest(); //400
+        var nurse = unitOfWork.Repository<Nurse>().Get(ViewModel.UserId);
+        if (ModelState.IsValid)
+            try
+            {
+                nurse.UpdateInfo(ViewModel);
+                //unitOfWork.Repository<Doctor>().Update(doctor);
+                unitOfWork.Complete();
+
+                // Set a success message using TempData
+                TempData["SuccessMessage"] = "nurse update successfully!";
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                if (env.IsDevelopment())
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                else
+                    // Set an error message using TempData
+                    TempData["ErrorMessage"] = "An Error Has Occurred during update nurse";
+                return View(ViewModel);
+            }
+
+        return View(ViewModel);
+    }
+
+    #endregion
 }

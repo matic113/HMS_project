@@ -8,39 +8,39 @@
     <div>
         <div class="mb-3">
             <label asp-for="FirstName" class="form-label"></label>
-            <input asp-for="FirstName" class="form-control" readonly />
+            <input asp-for="FirstName" class="form-control" readonly/>
         </div>
         <div class="mb-3">
             <label asp-for="MiddleName" class="form-label"></label>
-            <input asp-for="MiddleName" class="form-control" readonly />
+            <input asp-for="MiddleName" class="form-control" readonly/>
             <span asp-validation-for="MiddleName" class="text-danger"></span>
         </div>
         <div class="mb-3">
             <label asp-for="LastName" class="form-label"></label>
-            <input asp-for="LastName" class="form-control" readonly />
+            <input asp-for="LastName" class="form-control" readonly/>
         </div>
 
         <div class="mb-3">
             <label asp-for="Email" class="form-label"></label>
-            <input asp-for="Email" class="form-control" readonly />
+            <input asp-for="Email" class="form-control" readonly/>
         </div>
         <div class="mb-3">
             <label asp-for="Phone" class="form-label"></label>
-            <input asp-for="Phone" class="form-control" readonly />
+            <input asp-for="Phone" class="form-control" readonly/>
         </div>
         <div class="mb-3">
             <label asp-for="Gender" class="form-label"></label>
-            <input asp-for="Gender" class="form-control" readonly />
+            <input asp-for="Gender" class="form-control" readonly/>
         </div>
 
         <div class="mb-3">
             <label asp-for="DateOfBirth" class="form-label"></label>
-            <input asp-for="DateOfBirth" class="form-control" readonly />
+            <input asp-for="DateOfBirth" class="form-control" readonly/>
         </div>
 
         <div class="mb-3">
-			<label class="form-label">Clinic Name</label>
-            <input asp-for="Clinic.Name" class="form-control" readonly />
+            <label class="form-label">Clinic Name</label>
+            <input asp-for="Clinic.Name" class="form-control" readonly/>
         </div>
 
         <div class="card mb-3 shadow-sm">
@@ -51,21 +51,21 @@
                     {
                         <table class="table table-bordered">
                             <thead>
-                                <tr>
-                                    <th>Day</th>
-                                    <th>Start Time</th>
-                                    <th>End Time</th>
-                                </tr>
+                            <tr>
+                                <th>Day</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                            </tr>
                             </thead>
                             <tbody>
-                                @foreach (var item in Model.schedule)
-                                {
-                                    <tr>
-                                        <td>@item.Day</td>
-                                        <td>@item.StartTime.ToString("hh\\:mm")</td> <!-- Display as HH:MM -->
-                                        <td>@item.EndTime.ToString("hh\\:mm")</td>   <!-- Display as HH:MM -->
-                                    </tr>
-                                }
+                            @foreach (var item in Model.schedule)
+                            {
+                                <tr>
+                                    <td>@item.Day</td>
+                                    <td>@item.StartTime.ToString("hh\\:mm")</td> <!-- Display as HH:MM -->
+                                    <td>@item.EndTime.ToString("hh\\:mm")</td> <!-- Display as HH:MM -->
+                                </tr>
+                            }
                             </tbody>
                         </table>
                     }
@@ -78,6 +78,6 @@
         </div>
 
         <!-- Include your partial buttons (Edit/Delete, etc.) -->
-        <partial name="_ButtonsInDetailsPartial" model="Model.UserId" />
+        <partial name="_ButtonsInDetailsPartial" model="Model.UserId"/>
     </div>
 </div>

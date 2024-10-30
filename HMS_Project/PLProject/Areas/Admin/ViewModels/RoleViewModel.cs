@@ -1,9 +1,8 @@
-﻿namespace PLProject.Areas.Admin.ViewModels
+﻿namespace PLProject.Areas.Admin.ViewModels;
+
+public class RoleViewModel
 {
-    public class RoleViewModel
-    {
-        public string RoleId { get; set; }
-        public string RoleName { get; set; }
-        public bool IsSelected { get; set; }
-    }
+    public string RoleId { get; set; }
+    public string RoleName { get; set; }
+    public bool IsSelected { get; set; }
 }

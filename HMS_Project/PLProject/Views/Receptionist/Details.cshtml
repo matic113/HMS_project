@@ -1,14 +1,14 @@
 ﻿@model ReceptionistViewModel
 @{
-	ViewData["Title"] = "Receptionist Details";
+    ViewData["Title"] = "Receptionist Details";
 }
 <div class="container mt-5" style="min-height: 120vh">
-	<h1 class="page-title">Receptionist Details</h1>
-	
-	<div>
-		<partial name="userpartialviews\_UserDetailsDeletePartial" model="@Model" />
+    <h1 class="page-title">Receptionist Details</h1>
 
-		<partial name="_ButtonsInDetailsPartial" model="Model.UserId" />
+    <div>
+        <partial name="userpartialviews\_UserDetailsDeletePartial" model="@Model"/>
 
-	</div>
+        <partial name="_ButtonsInDetailsPartial" model="Model.UserId"/>
+
+    </div>
 </div>

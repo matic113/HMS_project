@@ -1,50 +1,52 @@
 ﻿@model IEnumerable<Invoice>
 @{
-	ViewData["Title"] = "Index";
+    ViewData["Title"] = "Index";
 }
 <div class="container mt-5">
-	<!-- Success Message -->
-	<partial name="SuccessMessage" />
-	<div class="title"><h1>Invoices</h1></div>
+    <!-- Success Message -->
+    <partial name="SuccessMessage"/>
+    <div class="title">
+        <h1>Invoices</h1>
+    </div>
 
-	<br />
-	<br />
-	<div class="create-invoice">
-		<a asp-controller="Invoice" asp-action="Create" class="btn btn-primary" id="createbtn"><i class="fa-solid fa-plus"></i>Create New Invoice</a>
-	</div>
-	<br />
-	@if (Model.Count() > 0)
-	{
-		<table class="mt-4 table table-striped table-hover">
-			<thead>
-				<tr>
-					<th>@Html.DisplayNameFor(I => I.InvoiceDate)</th>
-					<th>@Html.DisplayNameFor(I => I.TotalAmount)</th>
-					<th>@Html.DisplayNameFor(I => I.PaymentStatus)</th>
-					<th>@Html.DisplayNameFor(I => I.PaymentType)</th>
-					@*                 <th>@Html.DisplayNameFor(I => I.ApointmentId)</th> *@
-					<th>@Html.DisplayNameFor(I => I.ReceptionistUserId)</th>
-					<th>Details</th>
-					<th>Update</th>
-					<th>Delete</th>
-				</tr>
-			</thead>
-			<tbody>
-				@foreach (var invoice in Model)
-				{
-					<tr>
-						<td class="align-content-center">@Html.DisplayFor(I => invoice.InvoiceDate)</td>
-						<td class="align-content-center">@Html.DisplayFor(I => invoice.TotalAmount)</td>
-						<td class="align-content-center">@Html.DisplayFor(I => invoice.PaymentStatus)</td>
-						<td class="align-content-center">@Html.DisplayFor(I => invoice.PaymentType)</td>
-						@*                     <td class="align-content-center">@Html.DisplayFor(I => invoice.ApointmentId)</td> *@
-						<td class="align-content-center">@Html.DisplayFor(I => invoice.ReceptionistUserId)</td>
+    <br/>
+    <br/>
+    <div class="create-invoice">
+        <a asp-controller="Invoice" asp-action="Create" class="btn btn-primary" id="createbtn"><i class="fa-solid fa-plus"></i>Create New Invoice</a>
+    </div>
+    <br/>
+    @if (Model.Count() > 0)
+    {
+        <table class="mt-4 table table-striped table-hover">
+            <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(I => I.InvoiceDate)</th>
+                <th>@Html.DisplayNameFor(I => I.TotalAmount)</th>
+                <th>@Html.DisplayNameFor(I => I.PaymentStatus)</th>
+                <th>@Html.DisplayNameFor(I => I.PaymentType)</th>
+                @*                 <th>@Html.DisplayNameFor(I => I.ApointmentId)</th> *@
+                <th>@Html.DisplayNameFor(I => I.ReceptionistUserId)</th>
+                <th>Details</th>
+                <th>Update</th>
+                <th>Delete</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var invoice in Model)
+            {
+                <tr>
+                    <td class="align-content-center">@Html.DisplayFor(I => invoice.InvoiceDate)</td>
+                    <td class="align-content-center">@Html.DisplayFor(I => invoice.TotalAmount)</td>
+                    <td class="align-content-center">@Html.DisplayFor(I => invoice.PaymentStatus)</td>
+                    <td class="align-content-center">@Html.DisplayFor(I => invoice.PaymentType)</td>
+                    @*                     <td class="align-content-center">@Html.DisplayFor(I => invoice.ApointmentId)</td> *@
+                    <td class="align-content-center">@Html.DisplayFor(I => invoice.ReceptionistUserId)</td>
 
-						<partial name="_ButtonsPartial" model="@invoice.Id"></partial>
-					</tr>
-				}
-			</tbody>
-			@*  <tbody>
+                    <partial name="_ButtonsPartial" model="@invoice.Id"></partial>
+                </tr>
+            }
+            </tbody>
+            @*  <tbody>
 		@foreach (var invoice in Model)
 		{
 		<tr>
@@ -72,14 +74,14 @@
 		</tr>
 		}
 		</tbody> *@
-		</table>
-	}
-	else
-	{
-		<div class="mt-4 alert alert-warning">
-			<h3>There is no Invoices !</h3>
-		</div>
-	}
+        </table>
+    }
+    else
+    {
+        <div class="mt-4 alert alert-warning">
+            <h3>There is no Invoices !</h3>
+        </div>
+    }
 </div>
 <style>
 	.title {
@@ -113,7 +115,7 @@
 </style>
 
 @section Scripts {
-	<script>
+    <script>
 		// Automatically hide the success message after 5 seconds (5000 milliseconds)
 		$(document).ready(function () {
 			setTimeout(function () {

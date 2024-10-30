@@ -8,285 +8,286 @@ using System.Linq;
 using X.PagedList;
 using Microsoft.AspNetCore.Authorization;
 
-namespace PLProject.Controllers
+namespace PLProject.Controllers;
+
+[Authorize(Roles = $"{Roles.Admin}, {Roles.Pharmacist}")]
+public class MedicationController : Controller
 {
-	[Authorize(Roles = $"{Roles.Admin}, {Roles.Pharmacist}")]
-	public class MedicationController : Controller
-	{
-		#region DPI
-		private readonly IUnitOfWork unitOfWork;
-		private readonly IWebHostEnvironment env;
+    #region DPI
 
-		public MedicationController(IUnitOfWork unitOfWork, IWebHostEnvironment env)
-		{
-			this.unitOfWork = unitOfWork;
-			this.env = env;
-		}
+    private readonly IUnitOfWork unitOfWork;
+    private readonly IWebHostEnvironment env;
 
-		#endregion
+    public MedicationController(IUnitOfWork unitOfWork, IWebHostEnvironment env)
+    {
+        this.unitOfWork = unitOfWork;
+        this.env = env;
+    }
 
-		#region Index 
-		// Index Action
-		public IActionResult Index(string searchQuery, int page = 1)
-		{
-			var medications = unitOfWork.Repository<Medication>().GetALL();
+    #endregion
 
-			if (!string.IsNullOrEmpty(searchQuery))
-			{
-				medications = medications.Where(m => m.MedName.Contains(searchQuery)).ToList();
-			}
+    #region Index
 
-			var medicationViewModels = medications.Select(m => new MedicationViewModel
-			{
-				Id = m.Id,
-				Name = m.MedName,
-				Strength = m.Strength,
-			}).ToList();
+    // Index Action
+    public IActionResult Index(string searchQuery, int page = 1)
+    {
+        var medications = unitOfWork.Repository<Medication>().GetALL();
 
-			var pagedList = medicationViewModels.ToPagedList(page, 10);
-			ViewData["CurrentFilter"] = searchQuery;
+        if (!string.IsNullOrEmpty(searchQuery))
+            medications = medications.Where(m => m.MedName.Contains(searchQuery)).ToList();
 
-			return View(pagedList);
-		}
-		#endregion
+        var medicationViewModels = medications.Select(m => new MedicationViewModel
+        {
+            Id = m.Id,
+            Name = m.MedName,
+            Strength = m.Strength
+        }).ToList();
 
-		#region Greate
-		// Create Action (GET)
-		public IActionResult Create()
-		{
-			var activeSubstances = unitOfWork.Repository<ActiveSubstance>().GetALL().Select(a => new ActiveSubstanceViewModel
-			{
-				Id = a.Id,
-				ActiveSubstancesName = a.ActiveSubstancesName
-			}).ToList();
+        var pagedList = medicationViewModels.ToPagedList(page, 10);
+        ViewData["CurrentFilter"] = searchQuery;
 
-			var viewModel = new MedicationViewModel
-			{
-				ActiveSubstances = activeSubstances,
-				ActiveSubstanceIds = new List<int>() // Initialize the list for selected IDs
-			};
+        return View(pagedList);
+    }
 
-			return View(viewModel);
-		}
+    #endregion
 
-		// POST: Medication/Create
-		[HttpPost]
-		public IActionResult Create(MedicationViewModel medicationViewModel)
-		{
-			if (ModelState.IsValid)
-			{
-				try
-				{
-					var medication = new Medication
-					{
-						MedName = medicationViewModel.Name,
-						Strength = medicationViewModel.Strength,
-						ActiveSubstances = new List<ActiveSubstance>()
-					};
+    #region Greate
 
-					// Collect selected active substances based on ActiveSubstanceIds
-					foreach (var id in medicationViewModel.ActiveSubstanceIds)
-					{
-						var activeSubstance = unitOfWork.Repository<ActiveSubstance>().GetALL().FirstOrDefault(a => a.Id == id);
-						if (activeSubstance != null)
-						{
-							medication.ActiveSubstances.Add(activeSubstance);
-						}
-					}
+    // Create Action (GET)
+    public IActionResult Create()
+    {
+        var activeSubstances = unitOfWork.Repository<ActiveSubstance>().GetALL().Select(a =>
+            new ActiveSubstanceViewModel
+            {
+                Id = a.Id,
+                ActiveSubstancesName = a.ActiveSubstancesName
+            }).ToList();
 
-					// Add the medication to the repository
-					unitOfWork.Repository<Medication>().Add(medication);
-					unitOfWork.Complete(); // Save changes
+        var viewModel = new MedicationViewModel
+        {
+            ActiveSubstances = activeSubstances,
+            ActiveSubstanceIds = new List<int>() // Initialize the list for selected IDs
+        };
 
-					// Set a success message using TempData
-					TempData["SuccessMessage"] = "Medication create successfully!";
+        return View(viewModel);
+    }
 
-					return RedirectToAction(nameof(Index));
-				}
-				catch (Exception ex)
-				{
-					// Handle exceptions and add error messages to the model state
+    // POST: Medication/Create
+    [HttpPost]
+    public IActionResult Create(MedicationViewModel medicationViewModel)
+    {
+        if (ModelState.IsValid)
+            try
+            {
+                var medication = new Medication
+                {
+                    MedName = medicationViewModel.Name,
+                    Strength = medicationViewModel.Strength,
+                    ActiveSubstances = new List<ActiveSubstance>()
+                };
 
-					if (env.IsDevelopment())
-						ModelState.AddModelError(string.Empty, ex.Message);
-					else
-						// Set an error message using TempData
-						TempData["ErrorMessage"] = "An Error Has Occurred during the create.";
+                // Collect selected active substances based on ActiveSubstanceIds
+                foreach (var id in medicationViewModel.ActiveSubstanceIds)
+                {
+                    var activeSubstance = unitOfWork.Repository<ActiveSubstance>().GetALL()
+                        .FirstOrDefault(a => a.Id == id);
+                    if (activeSubstance != null) medication.ActiveSubstances.Add(activeSubstance);
+                }
 
-					return View(medicationViewModel);
-				}
+                // Add the medication to the repository
+                unitOfWork.Repository<Medication>().Add(medication);
+                unitOfWork.Complete(); // Save changes
 
-			}
+                // Set a success message using TempData
+                TempData["SuccessMessage"] = "Medication create successfully!";
 
-			// If model state is invalid, repopulate the active substances
-			medicationViewModel.ActiveSubstances = unitOfWork.Repository<ActiveSubstance>().GetALL().Select(a => new ActiveSubstanceViewModel
-			{
-				Id = a.Id,
-				ActiveSubstancesName = a.ActiveSubstancesName
-			}).ToList();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions and add error messages to the model state
+                if (env.IsDevelopment())
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                else
+                    // Set an error message using TempData
+                    TempData["ErrorMessage"] = "An Error Has Occurred during the create.";
 
-			return View(medicationViewModel); // Return the view with the model to show validation errors
-		}
-		#endregion
+                return View(medicationViewModel);
+            }
 
-		#region Edit
-		// Edit Action (GET)
-		public IActionResult Edit(int id)
-		{
-			var medication = unitOfWork.Repository<Medication>().Get(id);
-			if (medication == null) return NotFound();
+        // If model state is invalid, repopulate the active substances
+        medicationViewModel.ActiveSubstances = unitOfWork.Repository<ActiveSubstance>().GetALL().Select(a =>
+            new ActiveSubstanceViewModel
+            {
+                Id = a.Id,
+                ActiveSubstancesName = a.ActiveSubstancesName
+            }).ToList();
 
-			var medicationViewModel = new MedicationViewModel
-			{
-				Id = medication.Id,
-				Name = medication.MedName,
-				Strength = medication.Strength,
-				ActiveSubstanceIds = medication.ActiveSubstances.Select(a => a.Id).ToList(),
-				ActiveSubstances = unitOfWork.Repository<ActiveSubstance>().GetALL().Select(a => new ActiveSubstanceViewModel
-				{
-					Id = a.Id,
-					ActiveSubstancesName = a.ActiveSubstancesName
-				}).ToList()
-			};
+        return View(medicationViewModel); // Return the view with the model to show validation errors
+    }
 
-			return View(medicationViewModel);
-		}
+    #endregion
 
-		// Edit Action (POST)
-		[HttpPost, ValidateAntiForgeryToken]
-		public IActionResult Edit([FromRoute] int Id, MedicationViewModel ViewModel)
-		{
+    #region Edit
 
-			if (Id != ViewModel.Id)
-				return BadRequest();//400
-			if (ModelState.IsValid)
-			{
-				try
-				{
-					// Retrieve the existing medication from the database
-					var medication = unitOfWork.Repository<Medication>().Get(ViewModel.Id);
+    // Edit Action (GET)
+    public IActionResult Edit(int id)
+    {
+        var medication = unitOfWork.Repository<Medication>().Get(id);
+        if (medication == null) return NotFound();
 
-					if (medication == null) return NotFound();
+        var medicationViewModel = new MedicationViewModel
+        {
+            Id = medication.Id,
+            Name = medication.MedName,
+            Strength = medication.Strength,
+            ActiveSubstanceIds = medication.ActiveSubstances.Select(a => a.Id).ToList(),
+            ActiveSubstances = unitOfWork.Repository<ActiveSubstance>().GetALL().Select(a =>
+                new ActiveSubstanceViewModel
+                {
+                    Id = a.Id,
+                    ActiveSubstancesName = a.ActiveSubstancesName
+                }).ToList()
+        };
 
-					// Update medication properties
-					medication.MedName = ViewModel.Name;
-					medication.Strength = ViewModel.Strength;
+        return View(medicationViewModel);
+    }
 
-					// Update the active substances
-					medication.ActiveSubstances = ViewModel.ActiveSubstanceIds
-						.Select(id => new ActiveSubstance { Id = id })
-						.ToList();
+    // Edit Action (POST)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Edit([FromRoute] int Id, MedicationViewModel ViewModel)
+    {
+        if (Id != ViewModel.Id)
+            return BadRequest(); //400
+        if (ModelState.IsValid)
+            try
+            {
+                // Retrieve the existing medication from the database
+                var medication = unitOfWork.Repository<Medication>().Get(ViewModel.Id);
 
-					// Save changes to the repository
-					unitOfWork.Repository<Medication>().Update(medication);
+                if (medication == null) return NotFound();
 
-					unitOfWork.Complete(); // Commit the changes to the database
+                // Update medication properties
+                medication.MedName = ViewModel.Name;
+                medication.Strength = ViewModel.Strength;
 
-					// Set a success message using TempData
-					TempData["SuccessMessage"] = "Medication update successfully!";
+                // Update the active substances
+                medication.ActiveSubstances = ViewModel.ActiveSubstanceIds
+                    .Select(id => new ActiveSubstance { Id = id })
+                    .ToList();
 
-					return RedirectToAction(nameof(Index)); // Redirect to the index action after successful update
-				}
-				catch (Exception ex)
-				{
-					// Handle exceptions and add error messages to the model state
+                // Save changes to the repository
+                unitOfWork.Repository<Medication>().Update(medication);
 
-					if (env.IsDevelopment())
-						ModelState.AddModelError(string.Empty, ex.Message);
-					else
-						// Set an error message using TempData
-						TempData["ErrorMessage"] = "An Error Has Occurred during the update.";
+                unitOfWork.Complete(); // Commit the changes to the database
 
-					return View(ViewModel);
-				}
+                // Set a success message using TempData
+                TempData["SuccessMessage"] = "Medication update successfully!";
 
-			}
+                return RedirectToAction(nameof(Index)); // Redirect to the index action after successful update
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions and add error messages to the model state
+                if (env.IsDevelopment())
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                else
+                    // Set an error message using TempData
+                    TempData["ErrorMessage"] = "An Error Has Occurred during the update.";
 
-			// If the model state is invalid, repopulate the active substances
-			ViewModel.ActiveSubstances = unitOfWork.Repository<ActiveSubstance>().GetALL().Select(a => new ActiveSubstanceViewModel
-			{
-				Id = a.Id,
-				ActiveSubstancesName = a.ActiveSubstancesName
-			}).ToList();
+                return View(ViewModel);
+            }
 
-			return View(ViewModel); // Return the view with the model to show validation errors
-		}
-		#endregion
+        // If the model state is invalid, repopulate the active substances
+        ViewModel.ActiveSubstances = unitOfWork.Repository<ActiveSubstance>().GetALL().Select(a =>
+            new ActiveSubstanceViewModel
+            {
+                Id = a.Id,
+                ActiveSubstancesName = a.ActiveSubstancesName
+            }).ToList();
 
-		#region Details
-		// Details Action
-		public IActionResult Details(int id)
-		{
-			var medication = unitOfWork.Repository<Medication>().Get(id);
-			if (medication == null) return NotFound();
+        return View(ViewModel); // Return the view with the model to show validation errors
+    }
 
-			var medicationViewModel = new MedicationViewModel
-			{
-				Id = medication.Id,
-				Name = medication.MedName,
-				Strength = medication.Strength,
-				ActiveSubstances = medication.ActiveSubstances.Select(a => new ActiveSubstanceViewModel
-				{
-					Id = a.Id,
-					ActiveSubstancesName = a.ActiveSubstancesName,
-				}).ToList()
-			};
+    #endregion
 
-			return View(medicationViewModel);
-		}
-		#endregion
+    #region Details
 
-		#region delete 
-		public IActionResult Delete(int id)
-		{
-			var medication = unitOfWork.Repository<Medication>().Get(id);
-			if (medication == null) return NotFound();
+    // Details Action
+    public IActionResult Details(int id)
+    {
+        var medication = unitOfWork.Repository<Medication>().Get(id);
+        if (medication == null) return NotFound();
 
-			var medicationViewModel = new MedicationViewModel
-			{
-				Id = medication.Id,
-				Name = medication.MedName,
-				Strength = medication.Strength,
-				ActiveSubstances = medication.ActiveSubstances.Select(a => new ActiveSubstanceViewModel
-				{
-					Id = a.Id,
-					ActiveSubstancesName = a.ActiveSubstancesName,
-				}).ToList()
-			};
+        var medicationViewModel = new MedicationViewModel
+        {
+            Id = medication.Id,
+            Name = medication.MedName,
+            Strength = medication.Strength,
+            ActiveSubstances = medication.ActiveSubstances.Select(a => new ActiveSubstanceViewModel
+            {
+                Id = a.Id,
+                ActiveSubstancesName = a.ActiveSubstancesName
+            }).ToList()
+        };
 
-			return View(medicationViewModel);
-		}
+        return View(medicationViewModel);
+    }
 
-		// Delete Action (POST)
-		[HttpPost, ValidateAntiForgeryToken]
-		public IActionResult Delete([FromRoute] int Id, MedicationViewModel ViewModel)
-		{
+    #endregion
 
-			if (Id != ViewModel.Id)
-				return BadRequest();//400
-			try
-			{
-				var medication = unitOfWork.Repository<Medication>().Get(ViewModel.Id);
-				unitOfWork.Repository<Medication>().Delete(medication);
-				unitOfWork.Complete();
+    #region delete
+
+    public IActionResult Delete(int id)
+    {
+        var medication = unitOfWork.Repository<Medication>().Get(id);
+        if (medication == null) return NotFound();
+
+        var medicationViewModel = new MedicationViewModel
+        {
+            Id = medication.Id,
+            Name = medication.MedName,
+            Strength = medication.Strength,
+            ActiveSubstances = medication.ActiveSubstances.Select(a => new ActiveSubstanceViewModel
+            {
+                Id = a.Id,
+                ActiveSubstancesName = a.ActiveSubstancesName
+            }).ToList()
+        };
+
+        return View(medicationViewModel);
+    }
+
+    // Delete Action (POST)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Delete([FromRoute] int Id, MedicationViewModel ViewModel)
+    {
+        if (Id != ViewModel.Id)
+            return BadRequest(); //400
+        try
+        {
+            var medication = unitOfWork.Repository<Medication>().Get(ViewModel.Id);
+            unitOfWork.Repository<Medication>().Delete(medication);
+            unitOfWork.Complete();
 
 
-				// Set a success message using TempData
-				TempData["SuccessMessage"] = "Medication delete successfully!";
+            // Set a success message using TempData
+            TempData["SuccessMessage"] = "Medication delete successfully!";
 
-				return RedirectToAction(nameof(Index));
-			}
-			catch (Exception ex)
-			{
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            if (env.IsDevelopment())
+                ModelState.AddModelError(string.Empty, ex.Message);
+            else
+                ModelState.AddModelError(string.Empty, "An Error Has Occurred during Delete.");
 
-				if (env.IsDevelopment())
-					ModelState.AddModelError(string.Empty, ex.Message);
-				else
-					ModelState.AddModelError(string.Empty, "An Error Has Occurred during Delete.");
-
-				return View(ViewModel);
-			}
-		}
-	}
-	#endregion
+            return View(ViewModel);
+        }
+    }
 }
+
+#endregion

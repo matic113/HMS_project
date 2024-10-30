@@ -9,182 +9,186 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Project.ViewModels;
 
-namespace PLProject.Controllers
+namespace PLProject.Controllers;
+
+public class DoctorController : Controller
 {
-	public class DoctorController : Controller
-	{
-		#region DPI
-		private readonly IUnitOfWork unitOfWork;
-		private readonly IWebHostEnvironment env;
+    #region DPI
 
-		public DoctorController(IUnitOfWork unitOfWork, IWebHostEnvironment _env)
-		{
-			this.unitOfWork = unitOfWork;
-			env = _env;
-		}
-		#endregion
+    private readonly IUnitOfWork unitOfWork;
+    private readonly IWebHostEnvironment env;
 
-		#region Index (List Doctors)
-		[Authorize(Roles = Roles.Admin)]
+    public DoctorController(IUnitOfWork unitOfWork, IWebHostEnvironment _env)
+    {
+        this.unitOfWork = unitOfWork;
+        env = _env;
+    }
 
-		public IActionResult Index()
-		{
-			var doctors = unitOfWork.Repository<Doctor>().GetALL();
-			var doctorViewModels = doctors.Select(d => (DoctorViewModel)d).ToList();
-			return View(doctorViewModels);
-		}
-		#endregion
+    #endregion
 
-		#region Specialization
-		[Authorize(Roles = Roles.Admin)]
+    #region Index (List Doctors)
 
-		public IActionResult AddSpecialization()
-		{
-			return View();
-		}
+    [Authorize(Roles = Roles.Admin)]
+    public IActionResult Index()
+    {
+        var doctors = unitOfWork.Repository<Doctor>().GetALL();
+        var doctorViewModels = doctors.Select(d => (DoctorViewModel)d).ToList();
+        return View(doctorViewModels);
+    }
 
-		[HttpPost]
-		public IActionResult AddSpecialization(DoctorSpecializationLookup doctorSpecializationLookup)
-		{
-			if (ModelState.IsValid)
-			{
-				var spec = new BaseSpecification<DoctorSpecializationLookup>(ds => ds.Specialization == doctorSpecializationLookup.Specialization);
-				var Specialization = unitOfWork.Repository<DoctorSpecializationLookup>().GetEntityWithSpec(spec);
+    #endregion
 
-				if (Specialization is null)
-				{
-					unitOfWork.Repository<DoctorSpecializationLookup>().Add(doctorSpecializationLookup);
-					unitOfWork.Complete();
+    #region Specialization
 
-					// Set a success message using TempData
-					TempData["SuccessMessage"] = "Specialization added successfully!";
-					return RedirectToAction(nameof(Index));
-				}
-				else
-				{
-					// Set an error message using TempData
-					TempData["ErrorMessage"] = "This specialization already exists.";
-					return View(doctorSpecializationLookup);
-				}
-			}
+    [Authorize(Roles = Roles.Admin)]
+    public IActionResult AddSpecialization()
+    {
+        return View();
+    }
 
-			return View(doctorSpecializationLookup);
-		}
-		#endregion
+    [HttpPost]
+    public IActionResult AddSpecialization(DoctorSpecializationLookup doctorSpecializationLookup)
+    {
+        if (ModelState.IsValid)
+        {
+            var spec = new BaseSpecification<DoctorSpecializationLookup>(ds =>
+                ds.Specialization == doctorSpecializationLookup.Specialization);
+            var Specialization = unitOfWork.Repository<DoctorSpecializationLookup>().GetEntityWithSpec(spec);
+
+            if (Specialization is null)
+            {
+                unitOfWork.Repository<DoctorSpecializationLookup>().Add(doctorSpecializationLookup);
+                unitOfWork.Complete();
+
+                // Set a success message using TempData
+                TempData["SuccessMessage"] = "Specialization added successfully!";
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                // Set an error message using TempData
+                TempData["ErrorMessage"] = "This specialization already exists.";
+                return View(doctorSpecializationLookup);
+            }
+        }
+
+        return View(doctorSpecializationLookup);
+    }
+
+    #endregion
 
 
-		#region Details
-		[Authorize(Roles = Roles.Admin + "," + Roles.Doctor)]  // Admins can edit all, doctors can edit their own profile
+    #region Details
 
-		[Route("Doctor/Details/{userId}")]
-		public IActionResult Details(string userId)
-		{
-			if (userId is null)
-				return BadRequest(); // 400
+    [Authorize(Roles = Roles.Admin + "," + Roles.Doctor)] // Admins can edit all, doctors can edit their own profile
+    [Route("Doctor/Details/{userId}")]
+    public IActionResult Details(string userId)
+    {
+        if (userId is null)
+            return BadRequest(); // 400
 
-			var spec = new BaseSpecification<Doctor>(e => e.UserId == userId);
-			spec.Includes.Add(e => e.DoctorSpecialization);
+        var spec = new BaseSpecification<Doctor>(e => e.UserId == userId);
+        spec.Includes.Add(e => e.DoctorSpecialization);
 
-			var doctor = unitOfWork.Repository<Doctor>().GetEntityWithSpec(spec);
+        var doctor = unitOfWork.Repository<Doctor>().GetEntityWithSpec(spec);
 
-			if (doctor is null)
-				return NotFound(); // 404
+        if (doctor is null)
+            return NotFound(); // 404
 
-			var doctorViewModel = (DoctorViewModel)doctor;
+        var doctorViewModel = (DoctorViewModel)doctor;
 
-			return View(doctorViewModel);
-		}
-		#endregion
+        return View(doctorViewModel);
+    }
 
-		#region Edit
-		[Authorize(Roles = Roles.Admin + "," + Roles.Doctor)]  // Admins can edit all, doctors can edit their own profile
-		[Route("Doctor/Edit/{userId}")]
-		public IActionResult Edit(string userId)
-		{
-			if (userId is null)
-				return BadRequest(); // 400
+    #endregion
 
-			var doctor = unitOfWork.Repository<Doctor>().Get(userId);
-			unitOfWork.Complete();
+    #region Edit
 
-			if (doctor is null)
-				return NotFound(); // 404
+    [Authorize(Roles = Roles.Admin + "," + Roles.Doctor)] // Admins can edit all, doctors can edit their own profile
+    [Route("Doctor/Edit/{userId}")]
+    public IActionResult Edit(string userId)
+    {
+        if (userId is null)
+            return BadRequest(); // 400
 
-			var doctorViewModel = (DoctorViewModel)doctor;
+        var doctor = unitOfWork.Repository<Doctor>().Get(userId);
+        unitOfWork.Complete();
 
-			unitOfWork.Complete();
+        if (doctor is null)
+            return NotFound(); // 404
 
-			return View(doctorViewModel);
-		}
+        var doctorViewModel = (DoctorViewModel)doctor;
 
-		[Authorize(Roles = Roles.Admin + "," + Roles.Doctor)]  // Admins can edit all, doctors can edit their own profile
-		[HttpPost, ValidateAntiForgeryToken]
-		[Route("Doctor/Edit/{userId}")]
-		public IActionResult Edit([FromRoute] string userId, DoctorViewModel ViewModel)
-		{
-			if (userId != ViewModel.UserId)
-				return BadRequest();//400
-			Doctor doctor = unitOfWork.Repository<Doctor>().Get(ViewModel.UserId);
+        unitOfWork.Complete();
 
-			if (ModelState.IsValid)
-			{
-				try
-				{
-					doctor.UpdatedDoctor(ViewModel);
-					//unitOfWork.Repository<Doctor>().Update(doctor);
-					unitOfWork.Complete();
+        return View(doctorViewModel);
+    }
 
-					// Set a success message using TempData
-					TempData["SuccessMessage"] = "Doctor update successfully!";
-					if (User.IsInRole(Roles.Doctor))
-						return RedirectToAction(nameof(Index),controllerName:"Home");
-					else 						
-						return RedirectToAction(nameof(Index));
-				}
-				catch (Exception ex)
-				{
-					if (env.IsDevelopment())
-						ModelState.AddModelError(string.Empty, ex.Message);
-					else
-						// Set an error message using TempData
-						TempData["ErrorMessage"] = "An Error Has Occurred during update doctor";
-					return View(ViewModel);
-				}
-			}
+    [Authorize(Roles = Roles.Admin + "," + Roles.Doctor)] // Admins can edit all, doctors can edit their own profile
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Route("Doctor/Edit/{userId}")]
+    public IActionResult Edit([FromRoute] string userId, DoctorViewModel ViewModel)
+    {
+        if (userId != ViewModel.UserId)
+            return BadRequest(); //400
+        var doctor = unitOfWork.Repository<Doctor>().Get(ViewModel.UserId);
 
-			return View(ViewModel);
+        if (ModelState.IsValid)
+            try
+            {
+                doctor.UpdatedDoctor(ViewModel);
+                //unitOfWork.Repository<Doctor>().Update(doctor);
+                unitOfWork.Complete();
 
-		}
-		#endregion
+                // Set a success message using TempData
+                TempData["SuccessMessage"] = "Doctor update successfully!";
+                if (User.IsInRole(Roles.Doctor))
+                    return RedirectToAction(nameof(Index), "Home");
+                else
+                    return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                if (env.IsDevelopment())
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                else
+                    // Set an error message using TempData
+                    TempData["ErrorMessage"] = "An Error Has Occurred during update doctor";
+                return View(ViewModel);
+            }
 
-		#region Delete Schedule day 
-		[Authorize(Roles = Roles.Admin)]
-		[HttpPost]
-		public IActionResult DeleteScheduleDay(int ScheduleId)
-		{
-			try
-			{
-				// Find the schedule entry based on DoctorId and DayId
-				var scheduleDay = unitOfWork.Repository<DoctorScheduleLookup>().Get(ScheduleId);
+        return View(ViewModel);
+    }
 
-				if (scheduleDay == null)
-				{
-					return Json(new { success = false, message = "Schedule day not found." });
-				}
+    #endregion
 
-				// Delete the schedule day
-				unitOfWork.Repository<DoctorScheduleLookup>().Delete(scheduleDay);
-				unitOfWork.Complete();
+    #region Delete Schedule day
 
-				// Return success response
-				return Json(new { success = true });
-			}
-			catch (Exception ex)
-			{
-				// Return error response
-				return Json(new { success = false, message = "Error occurred: " + ex.Message });
-			}
-		}
-		#endregion
-	}
+    [Authorize(Roles = Roles.Admin)]
+    [HttpPost]
+    public IActionResult DeleteScheduleDay(int ScheduleId)
+    {
+        try
+        {
+            // Find the schedule entry based on DoctorId and DayId
+            var scheduleDay = unitOfWork.Repository<DoctorScheduleLookup>().Get(ScheduleId);
+
+            if (scheduleDay == null) return Json(new { success = false, message = "Schedule day not found." });
+
+            // Delete the schedule day
+            unitOfWork.Repository<DoctorScheduleLookup>().Delete(scheduleDay);
+            unitOfWork.Complete();
+
+            // Return success response
+            return Json(new { success = true });
+        }
+        catch (Exception ex)
+        {
+            // Return error response
+            return Json(new { success = false, message = "Error occurred: " + ex.Message });
+        }
+    }
+
+    #endregion
 }

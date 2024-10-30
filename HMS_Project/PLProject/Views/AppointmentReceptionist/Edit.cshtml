@@ -8,7 +8,7 @@
 
 <div class="container mt-5" style="min-height: 100vh">
     <!-- Error Message -->
-    <partial name="ErrorMessage" />
+    <partial name="ErrorMessage"/>
     <h1 class="page-title">Edit Appointment</h1>
 
     @if (Model is not null)
@@ -20,30 +20,42 @@
             <div class="card-body">
                 <div class="row text-center mb-3">
                     <div class="col-md-6">
-                        <p><strong>Date:</strong> @Model.ApointmentDate.ToString("dd MMM yyyy")</p>
+                        <p>
+                            <strong>Date:</strong> @Model.ApointmentDate.ToString("dd MMM yyyy")
+                        </p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Time:</strong> @Model.ApointmentTime?.ToString("hh:mm tt")</p>
+                        <p>
+                            <strong>Time:</strong> @Model.ApointmentTime?.ToString("hh:mm tt")
+                        </p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Doctor:</strong> @(Model.Doctor?.AppUser?.FullName ?? "No Doctor Assigned")</p>
+                        <p>
+                            <strong>Doctor:</strong> @(Model.Doctor?.AppUser?.FullName ?? "No Doctor Assigned")
+                        </p>
                     </div>
 
                     <div class="col-md-6">
-                        <p><strong>Clinic:</strong> @(Model.Clinic?.Name ?? "No Clinic Assigned")</p>
+                        <p>
+                            <strong>Clinic:</strong> @(Model.Clinic?.Name ?? "No Clinic Assigned")
+                        </p>
                     </div>
 
                     <div class="col-md-6">
-                        <p><strong>Patient Name:</strong> @(Model.Patient?.AppUser?.FullName ?? "No Patient Assigned")</p>
+                        <p>
+                            <strong>Patient Name:</strong> @(Model.Patient?.AppUser?.FullName ?? "No Patient Assigned")
+                        </p>
                     </div>
 
                     <div class="col-md-6">
-                        <p><strong>Status:</strong> @Model.ApointmentStatus</p>
+                        <p>
+                            <strong>Status:</strong> @Model.ApointmentStatus
+                        </p>
                     </div>
 
-                    </div>
                 </div>
             </div>
+        </div>
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-info text-white text-center">
                 <strong>Invoice Payment</strong>
@@ -51,11 +63,11 @@
             <div class="card-body">
                 <form asp-action="Edit" method="post">
                     <!-- Hidden Fields -->
-                    <input type="hidden" asp-for="Id" />
-                    <input type="hidden" asp-for="DoctorId" />
-                    <input type="hidden" asp-for="ReceptionistId" />
-                    <input type="hidden" asp-for="Clinic" />
-                    <input type="hidden" asp-for="Patient" />
+                    <input type="hidden" asp-for="Id"/>
+                    <input type="hidden" asp-for="DoctorId"/>
+                    <input type="hidden" asp-for="ReceptionistId"/>
+                    <input type="hidden" asp-for="Clinic"/>
+                    <input type="hidden" asp-for="Patient"/>
 
                     <div class="row align-items-center">
                         <!-- Total Amount Field -->
@@ -69,11 +81,11 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Payment Status</label>
                             <div class="form-check">
-                                <input asp-for="Invoice.PaymentStatus" class="form-check-input" type="radio" value="true" id="Paid" />
+                                <input asp-for="Invoice.PaymentStatus" class="form-check-input" type="radio" value="true" id="Paid"/>
                                 <label class="form-check-label" for="Paid">Paid</label>
                             </div>
                             <div class="form-check">
-                                <input asp-for="Invoice.PaymentStatus" class="form-check-input" type="radio" value="false" id="NotPaid" />
+                                <input asp-for="Invoice.PaymentStatus" class="form-check-input" type="radio" value="false" id="NotPaid"/>
                                 <label class="form-check-label" for="NotPaid">Not Paid</label>
                             </div>
                             <span asp-validation-for="Invoice.PaymentStatus" class="text-danger"></span>
@@ -89,7 +101,6 @@
                 </form>
             </div>
         </div>
-
     }
     else
     {

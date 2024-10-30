@@ -17,22 +17,34 @@
             <div class="card-body">
                 <div class="row text-center mb-3">
                     <div class="col-md-6">
-                        <p><strong>Date:</strong> @Model.ApointmentDate.ToString("dd MMM yyyy")</p>
+                        <p>
+                            <strong>Date:</strong> @Model.ApointmentDate.ToString("dd MMM yyyy")
+                        </p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Time:</strong> @Model.ApointmentTime?.ToString("hh:mm tt")</p>
+                        <p>
+                            <strong>Time:</strong> @Model.ApointmentTime?.ToString("hh:mm tt")
+                        </p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Doctor:</strong> @Model.Doctor.AppUser.FullName</p>
+                        <p>
+                            <strong>Doctor:</strong> @Model.Doctor.AppUser.FullName
+                        </p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Clinic:</strong> @Model.Clinic.Name</p>
+                        <p>
+                            <strong>Clinic:</strong> @Model.Clinic.Name
+                        </p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Patient Name:</strong> @Model.Patient.AppUser.FullName</p>
+                        <p>
+                            <strong>Patient Name:</strong> @Model.Patient.AppUser.FullName
+                        </p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Status:</strong> @Model.ApointmentStatus</p>
+                        <p>
+                            <strong>Status:</strong> @Model.ApointmentStatus
+                        </p>
                     </div>
                 </div>
             </div>
@@ -59,19 +71,19 @@
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead class="table-light">
-                                <tr>
-                                    <th>Active Substance</th>
-                                    <th>Dosage</th>
-                                </tr>
+                            <tr>
+                                <th>Active Substance</th>
+                                <th>Dosage</th>
+                            </tr>
                             </thead>
                             <tbody>
-                                @foreach (var item in Model.PrescriptionViewModel.PrescriptionItems)
-                                {
-                                    <tr>
-                                        <td>@item.ActiveSubstance.ActiveSubstancesName</td>
-                                        <td>@item.FullDosage</td>
-                                    </tr>
-                                }
+                            @foreach (var item in Model.PrescriptionViewModel.PrescriptionItems)
+                            {
+                                <tr>
+                                    <td>@item.ActiveSubstance.ActiveSubstancesName</td>
+                                    <td>@item.FullDosage</td>
+                                </tr>
+                            }
                             </tbody>
                         </table>
                     </div>

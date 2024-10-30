@@ -23,36 +23,36 @@
         <div class="col-md-12">
             <table class="table table-bordered table-striped">
                 <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th style="white-space: nowrap;">User Name</th>
-                        <th>Full Name</th>
-                        <th>Email</th>
-                        <th style="white-space: nowrap;">Phone Number</th>
-                        <th>Role</th>
-                        <th>Actions </th>
-                    </tr>
+                <tr>
+                    <th>Id</th>
+                    <th style="white-space: nowrap;">User Name</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th style="white-space: nowrap;">Phone Number</th>
+                    <th>Role</th>
+                    <th>Actions </th>
+                </tr>
                 </thead>
                 <tbody>
-                    @foreach (var user in Model)
-                    {
-                        <tr class="align-content-center">
-                            <td style="white-space: nowrap;">@user.Id</td>
-                            <td>@user.UserName</td>
-                            <td>@user.FullName</td>
-                            <td>@user.Email</td>
-                            <td>@user.PhoneNumber</td>
-                            <td>@string.Join(", ", user.Roles)</td>
-                            <td class="d-flex">
-                                <a asp-area="Admin" asp-controller="User" asp-action="ManageRoles" asp-route-userId="@user.Id" class="btn btn-success me-2" style="white-space: nowrap;">
-                                    <i class="fas fa-edit pe-1"></i>Manage Roles
-                                </a>
-                                <a asp-area="Admin" asp-controller="User" asp-action="Edit" asp-route-userId="@user.Id" class="btn btn-primary" style="white-space: nowrap;">
-                                    <i class="fa-regular fa-user"></i>Modify User
-                                </a>
-                            </td>
-                        </tr>
-                    }
+                @foreach (var user in Model)
+                {
+                    <tr class="align-content-center">
+                        <td style="white-space: nowrap;">@user.Id</td>
+                        <td>@user.UserName</td>
+                        <td>@user.FullName</td>
+                        <td>@user.Email</td>
+                        <td>@user.PhoneNumber</td>
+                        <td>@string.Join(", ", user.Roles)</td>
+                        <td class="d-flex">
+                            <a asp-area="Admin" asp-controller="User" asp-action="ManageRoles" asp-route-userId="@user.Id" class="btn btn-success me-2" style="white-space: nowrap;">
+                                <i class="fas fa-edit pe-1"></i>Manage Roles
+                            </a>
+                            <a asp-area="Admin" asp-controller="User" asp-action="Edit" asp-route-userId="@user.Id" class="btn btn-primary" style="white-space: nowrap;">
+                                <i class="fa-regular fa-user"></i>Modify User
+                            </a>
+                        </td>
+                    </tr>
+                }
                 </tbody>
             </table>
         </div>
@@ -76,7 +76,7 @@
                     </li>
                 }
 
-                @for (int i = 1; i <= Model.PageCount; i++)
+                @for (var i = 1; i <= Model.PageCount; i++)
                 {
                     if (i == Model.PageNumber)
                     {

@@ -2,38 +2,38 @@
 
 <div class="mb-3">
     <label asp-for="Name" class="form-label"></label>
-    <input asp-for="Name" class="form-control form-control-plaintext ps-1" readonly />
+    <input asp-for="Name" class="form-control form-control-plaintext ps-1" readonly/>
     <span asp-validation-for="Name" class="text-danger"></span>
 </div>
 
 
 <div class="mb-3">
     <label asp-for="Strength" class="form-label"></label>
-    <input asp-for="Strength" class="form-control form-control-plaintext ps-1" readonly />
+    <input asp-for="Strength" class="form-control form-control-plaintext ps-1" readonly/>
     <span asp-validation-for="Strength" class="text-danger"></span>
 </div>
 
 
 <div class="mb-4">
-    
+
     @if (Model.ActiveSubstances.Count() > 0)
     {
         <div class="table-responsive">
             <table class="table table-hover table-bordered">
                 <thead class="table-dark">
-                    <tr>
-                        <th>@Html.DisplayNameFor(a => a.ActiveSubstances.First().ActiveSubstancesName)</th>
+                <tr>
+                    <th>@Html.DisplayNameFor(a => a.ActiveSubstances.First().ActiveSubstancesName)</th>
 
-                    </tr>
+                </tr>
                 </thead>
                 <tbody>
-                    @foreach (var ac in Model.ActiveSubstances)
-                    {
-                        <tr class="align-middle">
-                            <td>@ac.ActiveSubstancesName</td>
+                @foreach (var ac in Model.ActiveSubstances)
+                {
+                    <tr class="align-middle">
+                        <td>@ac.ActiveSubstancesName</td>
 
-                        </tr>
-                    }
+                    </tr>
+                }
                 </tbody>
             </table>
         </div>
@@ -45,5 +45,3 @@
         </div>
     }
 </div>
-
-

@@ -1,28 +1,27 @@
 ﻿@model InvoiceViewModel
 @{
-	ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create";
 }
 <div class="container mt-5">
-	<!-- Error Message -->
-	<partial name="ErrorMessage" />
-	<h1>Create New Invoice</h1>
-	<br />
-	<br />
+    <!-- Error Message -->
+    <partial name="ErrorMessage"/>
+    <h1>Create New Invoice</h1>
+    <br/>
+    <br/>
 
-	<form asp-asp-controller="Invoice" asp-action="Create" method="post">
-
-
-		<partial name="PartialViews/CreateEditInvoicePartial"></partial>
+    <form asp-asp-controller="Invoice" asp-action="Create" method="post">
 
 
+        <partial name="PartialViews/CreateEditInvoicePartial"></partial>
 
-		<input type="submit" value="Create" class="btn btn-primary mt-2" />
-		<a asp-controller="Invoice" asp-action="Index" class="btn btn-secondary mt-2">Back To List</a>
-	</form>
+
+        <input type="submit" value="Create" class="btn btn-primary mt-2"/>
+        <a asp-controller="Invoice" asp-action="Index" class="btn btn-secondary mt-2">Back To List</a>
+    </form>
 </div>
 
 @section Scripts {
-	<script>
+    <script>
 		// Automatically hide the error message after 5 seconds (5000 milliseconds)
 		$(document).ready(function () {
 			setTimeout(function () {
@@ -31,7 +30,7 @@
 		});
 	</script>
 }
-@section ClientSideValidation {
-	<partial name="_ValidationScriptsPartial"></partial>
-}
 
+@section ClientSideValidation {
+    <partial name="_ValidationScriptsPartial"></partial>
+}

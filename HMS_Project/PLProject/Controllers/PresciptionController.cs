@@ -13,126 +13,129 @@ using PLProject.ViewModels;
 using PLProject.ViewModels.PrescriptionVM;
 using X.PagedList;
 
-namespace PLProject.Controllers
+namespace PLProject.Controllers;
+
+[Authorize(Roles = Roles.Pharmacist)]
+public class PrescriptionController : Controller
 {
-	[Authorize(Roles = Roles.Pharmacist)]
-	public class PrescriptionController : Controller
-	{
-        #region DPI
-        private readonly IUnitOfWork unitOfWork;
-        private readonly IWebHostEnvironment env;
-        private readonly UserManager<AppUser> _userManager; // Add UserManager
+    #region DPI
 
-        public PrescriptionController(IUnitOfWork unitOfWork, IWebHostEnvironment _env, UserManager<AppUser> userManager)
+    private readonly IUnitOfWork unitOfWork;
+    private readonly IWebHostEnvironment env;
+    private readonly UserManager<AppUser> _userManager; // Add UserManager
+
+    public PrescriptionController(IUnitOfWork unitOfWork, IWebHostEnvironment _env, UserManager<AppUser> userManager)
+    {
+        this.unitOfWork = unitOfWork;
+        env = _env;
+        _userManager = userManager; // Initialize UserManager
+    }
+
+    #endregion
+
+    #region Index
+
+    public IActionResult Index(string searchQuery, int? page)
+    {
+        IEnumerable<Prescription> prescriptions;
+
+        if (!string.IsNullOrEmpty(searchQuery))
         {
-            this.unitOfWork = unitOfWork;
-            env = _env;
-            _userManager = userManager; // Initialize UserManager
+            var spec = new BaseSpecification<Apointment>(a => a.ApointmentStatus == ApointmentStatusEnum.Completed
+                                                              && a.Patient.AppUser.FullName.ToUpper()
+                                                                  .Contains(searchQuery.ToUpper()));
+            spec.Includes.Add(a => a.Patient);
+            spec.Includes.Add(a => a.Doctor);
+            spec.Includes.Add(a => a.Clinic);
+
+            prescriptions = unitOfWork.Repository<Apointment>().GetALLWithSpec(spec).Select(a => a.Prescription);
         }
-        #endregion
+        else
+        {
+            var spec = new BaseSpecification<Apointment>(a =>
+                a.ApointmentStatus == ApointmentStatusEnum.Completed);
+            spec.Includes.Add(a => a.Patient);
+            spec.Includes.Add(a => a.Doctor);
+            spec.Includes.Add(a => a.Clinic);
+            spec.Includes.Add(a => a.Prescription);
 
-        #region Index
-        public IActionResult Index(string searchQuery, int? page)
-		{
+            prescriptions = unitOfWork.Repository<Apointment>().GetALLWithSpec(spec).Select(a => a.Prescription);
+        }
 
-			IEnumerable<Prescription> prescriptions;
-			
-			if (!string.IsNullOrEmpty(searchQuery))
-			{
-				var spec = new BaseSpecification<Apointment>(a => a.ApointmentStatus == ApointmentStatusEnum.Completed
+        var prescriptionsVM = prescriptions.Select(p => p.ConvertPresciptionToPrescriptionViewModel());
+        // Pagination logic
+        var pageSize = 10;
+        var pageNumber = page ?? 1;
 
-                && a.Patient.AppUser.FullName.ToUpper().Contains(searchQuery.ToUpper()));
-				spec.Includes.Add(a => a.Patient);
-				spec.Includes.Add(a => a.Doctor);
-				spec.Includes.Add(a => a.Clinic);
+        ViewData["CurrentFilter"] = searchQuery;
+        var paginatedList = prescriptionsVM.ToPagedList(pageNumber, pageSize);
+        return View(paginatedList);
+    }
 
-				prescriptions = unitOfWork.Repository<Apointment>().GetALLWithSpec(spec).Select(a=>a.Prescription);
-			}
-			else
-			{
-				
-				var spec = new BaseSpecification<Apointment>(a => 
-				a.ApointmentStatus == ApointmentStatusEnum.Completed);
-				spec.Includes.Add(a => a.Patient);
-				spec.Includes.Add(a => a.Doctor);
-				spec.Includes.Add(a => a.Clinic);
-				spec.Includes.Add(a => a.Prescription);
+    #endregion
 
-				prescriptions = unitOfWork.Repository<Apointment>().GetALLWithSpec(spec).Select(a => a.Prescription);
-			}
-			var prescriptionsVM = prescriptions.Select(p => p.ConvertPresciptionToPrescriptionViewModel());
-			// Pagination logic
-			int pageSize = 10;
-			int pageNumber = page ?? 1;
+    #region Details
 
-			ViewData["CurrentFilter"] = searchQuery;
-			var paginatedList = prescriptionsVM.ToPagedList(pageNumber, pageSize);
-			return View(paginatedList);
-		}
-		#endregion
+    public IActionResult Details(int? Id, string viewname = "Details")
+    {
+        if (!Id.HasValue)
+            return BadRequest(); // 400
 
-		#region Details
-		public IActionResult Details(int? Id, string viewname = "Details")
-		{
-			if (!Id.HasValue)
-				return BadRequest(); // 400
+        var prescription = unitOfWork.Repository<Prescription>().Get(Id.Value);
+        var prescriptionVM = prescription.ConvertPresciptionToPrescriptionViewModel();
 
-			var prescription = unitOfWork.Repository<Prescription>().Get(Id.Value);
-			var prescriptionVM = prescription.ConvertPresciptionToPrescriptionViewModel();
+        if (prescriptionVM is null)
+            return NotFound(); // 404
 
-			if (prescriptionVM is null)
-				return NotFound(); // 404
+        return View(viewname, prescriptionVM);
+    }
 
-			return View(viewname, prescriptionVM);
-		}
-		#endregion
+    #endregion
 
-		#region Edit
-		public IActionResult Edit(int? Id)
-		{
-			return Details(Id, "Edit");
-		}
+    #region Edit
 
-        [HttpPost, ValidateAntiForgeryToken]
-        public IActionResult Edit([FromRoute] int Id, PrescriptionViewModel ViewModel)
-		{
+    public IActionResult Edit(int? Id)
+    {
+        return Details(Id, "Edit");
+    }
 
-            if (Id != ViewModel.prescriptionId)
-                return BadRequest();//400
-            ModelState.Remove<PrescriptionViewModel>(p => p.DoctorUserId);
-            // If the model is invalid, repopulate lists and return the view
-            if (!ModelState.IsValid)
-			{
-				return View(ViewModel);
-			}
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Edit([FromRoute] int Id, PrescriptionViewModel ViewModel)
+    {
+        if (Id != ViewModel.prescriptionId)
+            return BadRequest(); //400
+        ModelState.Remove<PrescriptionViewModel>(p => p.DoctorUserId);
+        // If the model is invalid, repopulate lists and return the view
+        if (!ModelState.IsValid) return View(ViewModel);
 
-			try
-			{
-				var user = _userManager.GetUserAsync(User).GetAwaiter().GetResult();
-				var updatedPrescription = unitOfWork.Repository<Prescription>().Get(ViewModel.prescriptionId);
-				updatedPrescription.PharmacistUserId = user.Id;
+        try
+        {
+            var user = _userManager.GetUserAsync(User).GetAwaiter().GetResult();
+            var updatedPrescription = unitOfWork.Repository<Prescription>().Get(ViewModel.prescriptionId);
+            updatedPrescription.PharmacistUserId = user.Id;
 
-				//// Update the Prescription
-				
-				updatedPrescription.ConvertPrescriptionViewModelToPresciption(ViewModel);
-				
-				unitOfWork.Repository<Prescription>().Update(updatedPrescription);
-				unitOfWork.Complete();
+            //// Update the Prescription
+
+            updatedPrescription.ConvertPrescriptionViewModelToPresciption(ViewModel);
+
+            unitOfWork.Repository<Prescription>().Update(updatedPrescription);
+            unitOfWork.Complete();
 
 
-				// Set a success message using TempData
-				TempData["SuccessMessage"] = "Prescription update successfully!";
+            // Set a success message using TempData
+            TempData["SuccessMessage"] = "Prescription update successfully!";
 
-				return RedirectToAction(nameof(Index));
-			}
-			catch (Exception ex)
-			{
-				// Handle exceptions and add error messages to the model state
-				var errorMessage = env.IsDevelopment() ? ex.Message : "An error occurred during the update.";
-				ModelState.AddModelError(string.Empty, errorMessage);
-				return View(ViewModel);
-			}
-		}
-		#endregion
-	}
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions and add error messages to the model state
+            var errorMessage = env.IsDevelopment() ? ex.Message : "An error occurred during the update.";
+            ModelState.AddModelError(string.Empty, errorMessage);
+            return View(ViewModel);
+        }
+    }
+
+    #endregion
 }

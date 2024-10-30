@@ -1,112 +1,113 @@
 ﻿@model DoctorViewModel
 @inject IUnitOfWork unitOfWork;
 @{
-	var SpecializationsDateReader = unitOfWork.Repository<DoctorSpecializationLookup>().GetALL();
-	ViewData["Title"] = "Edit Doctor";
-	var days = Enum.GetValues(typeof(DayOfWeek))
-		.Cast<DayOfWeek>()
-		.Select(day => new SelectListItem { Value = day.ToString(), Text = day.ToString() })
-		.ToList();
+    var SpecializationsDateReader = unitOfWork.Repository<DoctorSpecializationLookup>().GetALL();
+    ViewData["Title"] = "Edit Doctor";
+    var days = Enum.GetValues(typeof(DayOfWeek))
+        .Cast<DayOfWeek>()
+        .Select(day => new SelectListItem { Value = day.ToString(), Text = day.ToString() })
+        .ToList();
 }
 <div class="container mt-5" style="min-height: 200vh">
-	<!-- Error Message -->
-	<partial name="ErrorMessage" />
+    <!-- Error Message -->
+    <partial name="ErrorMessage"/>
 
-	<h1 class="page-title">Edit Doctor</h1>
+    <h1 class="page-title">Edit Doctor</h1>
 
-	<form asp-area="" asp-controller="Doctor" asp-action="Edit" method="post">
-		<partial name="userpartialviews\_UserEditPartial" model="@Model" />
+    <form asp-area="" asp-controller="Doctor" asp-action="Edit" method="post">
+        <partial name="userpartialviews\_UserEditPartial" model="@Model"/>
 
-		<div class="mt-3">
-			<label asp-for="specialization" class="form-label">Specialization</label>
-			<select asp-for="specializationId" class="form-control" required>
-				<option value="">Select Specialization</option>
-				@foreach (var specialization in SpecializationsDateReader)
-				{
-					<option value="@specialization.Id">@specialization.Specialization</option>
-				}
-			</select>
-			<span asp-validation-for="specialization" class="text-danger"></span>
-		</div>
+        <div class="mt-3">
+            <label asp-for="specialization" class="form-label">Specialization</label>
+            <select asp-for="specializationId" class="form-control" required>
+                <option value="">Select Specialization</option>
+                @foreach (var specialization in SpecializationsDateReader)
+                {
+                    <option value="@specialization.Id">@specialization.Specialization</option>
+                }
+            </select>
+            <span asp-validation-for="specialization" class="text-danger"></span>
+        </div>
 
-		<!-- Create Schedule Button (only shows if no schedule exists) -->
-		<div id="createScheduleContainer" class="mt-4 @(Model.schedule != null && Model.schedule.Count > 0 ? "d-none" : "")">
-			<button type="button" id="createScheduleButton" class="btn btn-primary mt-3">
-				<i class="fas fa-calendar-plus"></i> Create Schedule
-			</button>
-		</div>
+        <!-- Create Schedule Button (only shows if no schedule exists) -->
+        <div id="createScheduleContainer" class="mt-4 @(Model.schedule != null && Model.schedule.Count > 0 ? "d-none" : "")">
+            <button type="button" id="createScheduleButton" class="btn btn-primary mt-3">
+                <i class="fas fa-calendar-plus"></i> Create Schedule
+            </button>
+        </div>
 
-		<!-- Schedule Form Container -->
-		<div id="scheduleContainer" class="mt-2 @(Model.schedule != null && Model.schedule.Count > 0 ? "" : "d-none")">
-			<h4>Schedule</h4>
-			<hr>
+        <!-- Schedule Form Container -->
+        <div id="scheduleContainer" class="mt-2 @(Model.schedule != null && Model.schedule.Count > 0 ? "" : "d-none")">
+            <h4>Schedule</h4>
+            <hr>
 
-			<div id="itemsContainer">
-				@if (Model.schedule != null && Model.schedule.Count > 0)
-				{
-					for (int i = 0; i < Model.schedule.Count; i++)
-					{
-						var item = Model.schedule[i];
-						<div class="mb-3" data-index="@i">
-							<div class="row" data-index="@i" id="day_@item.Id">
-								<div class="col-md-4">
-									<label asp-for="schedule[@i].Day" class="form-label"></label>
-									<select asp-for="schedule[@i].Day" class="form-select schedule-day-select" required>
-										<option value="">Select day</option>
-										@foreach (var day in days)
-										{
-											<option value="@day.Value">@day.Text</option>
-										}
-									</select>
-									<span asp-validation-for="schedule[@i].Day" class="text-danger"></span>
-								</div>
+            <div id="itemsContainer">
+                @if (Model.schedule != null && Model.schedule.Count > 0)
+                {
+                    for (var i = 0; i < Model.schedule.Count; i++)
+                    {
+                        var item = Model.schedule[i];
+                        <div class="mb-3" data-index="@i">
+                            <div class="row" data-index="@i" id="day_@item.Id">
+                                <div class="col-md-4">
+                                    <label asp-for="schedule[@i].Day" class="form-label"></label>
+                                    <select asp-for="schedule[@i].Day" class="form-select schedule-day-select" required>
+                                        <option value="">Select day</option>
+                                        @foreach (var day in days)
+                                        {
+                                            <option value="@day.Value">@day.Text</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="schedule[@i].Day" class="text-danger"></span>
+                                </div>
 
-								<div class="col-md-3">
-									<label asp-for="schedule[@i].StartTime" class="form-label">Start Time</label>
-									<input type="time" asp-for="schedule[@i].StartTime" class="form-control" required />
-									<span asp-validation-for="schedule[@i].StartTime" class="text-danger"></span>
-								</div>
+                                <div class="col-md-3">
+                                    <label asp-for="schedule[@i].StartTime" class="form-label">Start Time</label>
+                                    <input type="time" asp-for="schedule[@i].StartTime" class="form-control" required/>
+                                    <span asp-validation-for="schedule[@i].StartTime" class="text-danger"></span>
+                                </div>
 
-								<div class="col-md-3">
-									<label asp-for="schedule[@i].EndTime" class="form-label">End Time</label>
-									<input type="time" asp-for="schedule[@i].EndTime" class="form-control" required />
-									<span asp-validation-for="schedule[@i].EndTime" class="text-danger"></span>
-								</div>
+                                <div class="col-md-3">
+                                    <label asp-for="schedule[@i].EndTime" class="form-label">End Time</label>
+                                    <input type="time" asp-for="schedule[@i].EndTime" class="form-control" required/>
+                                    <span asp-validation-for="schedule[@i].EndTime" class="text-danger"></span>
+                                </div>
 
-								<div class="col-md-2 d-flex align-items-end">
-									<button type="button" class="btn btn-danger DeleteDayButton" data-schedule-id="@Model.schedule[i].Id" data-index="@i">
-										<i class="fas fa-times-circle"></i> Remove Day
-									</button>
-								</div>
-							</div>
-						</div>
-					}
-				}
-			</div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="button" class="btn btn-danger DeleteDayButton" data-schedule-id="@Model.schedule[i].Id" data-index="@i">
+                                        <i class="fas fa-times-circle"></i> Remove Day
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
 
-			<button type="button" id="addDayButton" class="btn btn-success mt-2">
-				<i class="fas fa-plus-circle"></i> Add Day
-			</button>
-		</div>
-		<div class="justify-content-center">
-		<button type="submit" class="btn btn-primary mt-3">Submit</button>
-		@if (User.IsInRole(Roles.Admin))
-		{
-			<div class="cancel">
-				<a asp-action="Index" class="btn btn-danger"><i class="fa-solid fa-xmark"></i> Cancel</a>
-			</div>
-		}
-		else
-		{
-			<div class="cancel">
-				<a asp-controller="Home" asp-action="Index" class="btn btn-danger"><i class="fa-solid fa-xmark"></i> Cancel</a>
-			</div>
-		}
-		</div>
+            <button type="button" id="addDayButton" class="btn btn-success mt-2">
+                <i class="fas fa-plus-circle"></i> Add Day
+            </button>
+        </div>
+        <div class="justify-content-center">
+            <button type="submit" class="btn btn-primary mt-3">Submit</button>
+            @if (User.IsInRole(Roles.Admin))
+            {
+                <div class="cancel">
+                    <a asp-action="Index" class="btn btn-danger"><i class="fa-solid fa-xmark"></i> Cancel</a>
+                </div>
+            }
+            else
+            {
+                <div class="cancel">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-danger"><i class="fa-solid fa-xmark"></i> Cancel</a>
+                </div>
+            }
+        </div>
 
-	</form>
-	@section Scripts {
-		<script>
+    </form>
+
+    @section Scripts {
+        <script>
 			// Automatically hide the error message after 5 seconds (5000 milliseconds)
 			$(document).ready(function () {
 				setTimeout(function () {
@@ -114,8 +115,8 @@
 				}, 5000); // 5000 ms = 5 seconds
 			});
 		</script>
-		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-		<script type="text/javascript">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script type="text/javascript">
 			$(document).ready(function () {
 				var dayIndex = $('.schedule-day-select').length || 0;
 
@@ -153,9 +154,9 @@
 														<select name="schedule[${dayIndex}].Day" class="form-select schedule-day-select" required>
 															<option value="">Select day</option>
 			@foreach (var day in days)
-			{
-																		<option value="@day.Value">@day.Text</option>
-			}
+            {
+                <option value="@day.Value">@day.Text</option>
+            }
 														</select>
 														<span class="text-danger"></span>
 													</div>
@@ -261,6 +262,7 @@
 				});
 			});
 		</script>
-		@Html.Partial("_ValidationScriptsPartial")
-	}
+        @Html.Partial("_ValidationScriptsPartial")
+    }
+
 </div>

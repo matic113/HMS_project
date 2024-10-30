@@ -1,29 +1,29 @@
 ﻿@model PLProject.ViewModels.MedicationViewModel
 
 @{
-	ViewData["Title"] = "Edit Medication";
+    ViewData["Title"] = "Edit Medication";
 }
 <div class="container mt-5" style="min-height: 100vh">
 
-	<!-- Error Message -->
-	<partial name="ErrorMessage" />
+    <!-- Error Message -->
+    <partial name="ErrorMessage"/>
 
-	<h1 class="page-title">Edit Medication</h1>
+    <h1 class="page-title">Edit Medication</h1>
 
-	<form asp-action="Edit" method="post">
+    <form asp-action="Edit" method="post">
 
-		<partial name="PartialViews/CreateEditMedicationPartial" />
+        <partial name="PartialViews/CreateEditMedicationPartial"/>
 
-		<div class="mt-3 d-flex justify-content-between">
-			<button type="submit" class="btn btn-primary">Save </button>
-			<a asp-action="Index" class="btn btn-secondary">Cancel</a>
-		</div>
-	</form>
+        <div class="mt-3 d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Save </button>
+            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
 </div>
 
 
 @section Scripts {
-	<script>
+    <script>
 		// Automatically hide the error message after 5 seconds (5000 milliseconds)
 		$(document).ready(function () {
 			setTimeout(function () {
@@ -31,13 +31,13 @@
 			}, 5000); // 5000 ms = 5 seconds
 		});
 	</script>
-	@{
-		await Html.RenderPartialAsync("_ValidationScriptsPartial");
-	}
-	<script src="~/select2/js/select2.min.js"></script>
-	<link href="~/select2/css/select2.min.css" rel="stylesheet" />
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/select2/js/select2.min.js"></script>
+    <link href="~/select2/css/select2.min.css" rel="stylesheet"/>
 
-	<script>
+    <script>
 		$(document).ready(function () {
 			// Initialize Select2 for the active substances dropdown
 			$('.select2-multiple').select2({

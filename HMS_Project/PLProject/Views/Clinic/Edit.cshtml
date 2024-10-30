@@ -17,7 +17,7 @@
 
 <div class="container mt-5" style="min-height: 200vh">
     <!-- Error Message -->
-    <partial name="ErrorMessage" />
+    <partial name="ErrorMessage"/>
     <h1 class="page-title">Edit Clinic Information</h1>
 
     <form asp-controller="Clinic" asp-action="Edit" method="post">
@@ -29,7 +29,7 @@
             <div class="card-body">
                 <div class="mb-3">
                     <label asp-for="Name" class="form-label">Clinic Name</label>
-                    <input asp-for="Name" class="form-control" placeholder="Enter clinic name" required />
+                    <input asp-for="Name" class="form-control" placeholder="Enter clinic name" required/>
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
 
@@ -112,33 +112,33 @@
                 </div>
 
                 <!-- Assigned Nurses Card -->
-                    <div class="card mb-4">
-                        <div class="card-header bg-info text-white d-flex justify-content-between">
-                            <span>Assigned Nurses</span>
-                        </div>
-                        <div class="card-body">
-                            @if (Model.Nurses != null && Model.Nurses.Any())
-                            {
-                                <ul class="list-group" id="nurseList">
-                                    @foreach (var nurse in Model.Nurses)
-                                    {
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>@nurse.AppUser.FullName</strong> - @(nurse.Clinic?.Name ?? "No Clinic Assigned")
-                                            </div>
-                                            <button class="btn btn-danger btn-sm" onclick="removeNurse('@nurse.Id')">
-                                                <i class="fas fa-trash"></i> Remove
-                                            </button>
-                                        </li>
-                                    }
-                                </ul>
-                            }
-                            else
-                            {
-                                <p class="text-muted">No nurses assigned to this clinic.</p>
-                            }
-                        </div>
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white d-flex justify-content-between">
+                        <span>Assigned Nurses</span>
                     </div>
+                    <div class="card-body">
+                        @if (Model.Nurses != null && Model.Nurses.Any())
+                        {
+                            <ul class="list-group" id="nurseList">
+                                @foreach (var nurse in Model.Nurses)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>@nurse.AppUser.FullName</strong> - @(nurse.Clinic?.Name ?? "No Clinic Assigned")
+                                        </div>
+                                        <button class="btn btn-danger btn-sm" onclick="removeNurse('@nurse.Id')">
+                                            <i class="fas fa-trash"></i> Remove
+                                        </button>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No nurses assigned to this clinic.</p>
+                        }
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -151,14 +151,14 @@
                 <!-- Phone -->
                 <div class="mb-3">
                     <label asp-for="Phone" class="form-label">Phone Number</label>
-                    <input asp-for="Phone" class="form-control" placeholder="Enter phone number" required />
+                    <input asp-for="Phone" class="form-control" placeholder="Enter phone number" required/>
                     <span asp-validation-for="Phone" class="text-danger"></span>
                 </div>
 
                 <!-- Price -->
                 <div class="mb-3">
                     <label asp-for="Price" class="form-label">Consultation Price</label>
-                    <input asp-for="Price" class="form-control" placeholder="Enter price" required />
+                    <input asp-for="Price" class="form-control" placeholder="Enter price" required/>
                     <span asp-validation-for="Price" class="text-danger"></span>
                 </div>
             </div>
@@ -188,7 +188,7 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/select2/js/select2.min.js"></script>
-    <link href="~/select2/css/select2.min.css" rel="stylesheet" />
+    <link href="~/select2/css/select2.min.css" rel="stylesheet"/>
 
     <script>
          $(document).ready(function () {

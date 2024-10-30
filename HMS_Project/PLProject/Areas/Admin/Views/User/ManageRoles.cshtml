@@ -5,7 +5,7 @@
 
 <div class="container mt-5" style="min-height: 150vh">
     <h1 class="page-title">Manage User Roles</h1>
-    <br />
+    <br/>
     <form method="post">
         <div class="card">
             <div class="card-header">
@@ -13,13 +13,13 @@
                 Add/Remove Roles
             </div>
             <div class="card-body">
-                <input type="hidden" asp-for="UserId" />
-                @for (int i = 0; i < Model.Roles.Count; i++)
+                <input type="hidden" asp-for="UserId"/>
+                @for (var i = 0; i < Model.Roles.Count; i++)
                 {
                     <div class="form-check m-1">
-                        <input type="hidden" asp-for="@Model.Roles[i].RoleId" />
-                        <input type="hidden" asp-for="@Model.Roles[i].RoleName" />
-                        <input asp-for="@Model.Roles[i].IsSelected" class="form-check-input" />
+                        <input type="hidden" asp-for="@Model.Roles[i].RoleId"/>
+                        <input type="hidden" asp-for="@Model.Roles[i].RoleName"/>
+                        <input asp-for="@Model.Roles[i].IsSelected" class="form-check-input"/>
                         <label class="form-check-label" asp-for="@Model.Roles[i].IsSelected">
                             @Model.Roles[i].RoleName
                         </label>

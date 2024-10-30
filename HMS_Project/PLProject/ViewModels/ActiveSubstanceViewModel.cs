@@ -8,66 +8,65 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PLProject.ViewModels
+namespace PLProject.ViewModels;
+
+public class ActiveSubstanceViewModel
 {
-	public class ActiveSubstanceViewModel
-	{
-		public ActiveSubstanceViewModel()
-		{
-		}
-		public ActiveSubstanceViewModel(ActiveSubstance activeSubstance)
-		{
-			Id = activeSubstance.Id;
-			ActiveSubstancesName = activeSubstance.ActiveSubstancesName;
+    public ActiveSubstanceViewModel()
+    {
+    }
 
-			Medications = activeSubstance.Medications.ToList();
+    public ActiveSubstanceViewModel(ActiveSubstance activeSubstance)
+    {
+        Id = activeSubstance.Id;
+        ActiveSubstancesName = activeSubstance.ActiveSubstancesName;
 
-			Interactions = activeSubstance.ActSub1.Select(interaction => new ActiveSubstanceInteractionViewModel
-			{
-				Interaction = interaction.Interaction,
-				OtherSubstanceName = interaction.ActSub2?.ActiveSubstancesName ?? "Unknown",
-				ActSubId=interaction.ActiveSubstanceId2??0,
-			})
-			.Concat(activeSubstance.ActSub2.Select(interaction => new ActiveSubstanceInteractionViewModel
-			{
-				Interaction = interaction.Interaction,
-				OtherSubstanceName = interaction.ActSub1?.ActiveSubstancesName ?? "Unknown",
-				ActSubId = interaction.ActiveSubstanceId1 ?? 0
+        Medications = activeSubstance.Medications.ToList();
 
-			}))
-			.ToList();
-		}
-		public int Id { get; set; }
+        Interactions = activeSubstance.ActSub1.Select(interaction => new ActiveSubstanceInteractionViewModel
+            {
+                Interaction = interaction.Interaction,
+                OtherSubstanceName = interaction.ActSub2?.ActiveSubstancesName ?? "Unknown",
+                ActSubId = interaction.ActiveSubstanceId2 ?? 0
+            })
+            .Concat(activeSubstance.ActSub2.Select(interaction => new ActiveSubstanceInteractionViewModel
+            {
+                Interaction = interaction.Interaction,
+                OtherSubstanceName = interaction.ActSub1?.ActiveSubstancesName ?? "Unknown",
+                ActSubId = interaction.ActiveSubstanceId1 ?? 0
+            }))
+            .ToList();
+    }
 
-		[Required(ErrorMessage = "Active Substance is Required"), Display(Name = "Active Substance Name")]
-		public string ActiveSubstancesName { get; set; } = null!;
+    public int Id { get; set; }
 
-		public HashSet<int>? MedicationId { get; set; } = new HashSet<int>();
+    [Required(ErrorMessage = "Active Substance is Required")]
+    [Display(Name = "Active Substance Name")]
+    public string ActiveSubstancesName { get; set; } = null!;
 
-		public List<Medication>? Medications { get; set; } = new List<Medication>();
-		public List<ActiveSubstanceInteractionViewModel>? Interactions { get; set; } = new List<ActiveSubstanceInteractionViewModel>();
+    public HashSet<int>? MedicationId { get; set; } = new();
 
-		public static explicit operator ActiveSubstance(ActiveSubstanceViewModel viewModel)
-		{
-			var activeSubstance = new ActiveSubstance
-			{
-				ActiveSubstancesName = viewModel.ActiveSubstancesName,
-				Medications = viewModel.Medications
-			};
-			foreach (var Interaction in viewModel.Interactions)
-			{
-				activeSubstance.ActSub1.Add(new ActiveSubstanceInteraction
-				{
-					ActiveSubstanceId2 = Interaction.ActSubId,
-					Interaction = Interaction.Interaction
-				});
-			}
-			return activeSubstance;
-		}
+    public List<Medication>? Medications { get; set; } = new();
+    public List<ActiveSubstanceInteractionViewModel>? Interactions { get; set; } = new();
 
-		public static explicit operator ActiveSubstanceViewModel(ActiveSubstance activeSubstance)
-		{
-			return new ActiveSubstanceViewModel(activeSubstance);
-		}
-	}
+    public static explicit operator ActiveSubstance(ActiveSubstanceViewModel viewModel)
+    {
+        var activeSubstance = new ActiveSubstance
+        {
+            ActiveSubstancesName = viewModel.ActiveSubstancesName,
+            Medications = viewModel.Medications
+        };
+        foreach (var Interaction in viewModel.Interactions)
+            activeSubstance.ActSub1.Add(new ActiveSubstanceInteraction
+            {
+                ActiveSubstanceId2 = Interaction.ActSubId,
+                Interaction = Interaction.Interaction
+            });
+        return activeSubstance;
+    }
+
+    public static explicit operator ActiveSubstanceViewModel(ActiveSubstance activeSubstance)
+    {
+        return new ActiveSubstanceViewModel(activeSubstance);
+    }
 }

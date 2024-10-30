@@ -14,7 +14,7 @@
         <h4 class="card-title mb-3">Active Substance Information</h4>
         <div class="mb-3">
             <label asp-for="ActiveSubstancesName" class="form-label fw-bold">Active Substance Name:</label>
-            <input asp-for="ActiveSubstancesName" class="form-control-plaintext ps-1" readonly />
+            <input asp-for="ActiveSubstancesName" class="form-control-plaintext ps-1" readonly/>
             <span asp-validation-for="ActiveSubstancesName" class="text-danger"></span>
         </div>
     </div>
@@ -29,19 +29,19 @@
             <div class="table-responsive">
                 <table class="table table-hover table-bordered align-middle">
                     <thead class="table-light">
-                        <tr>
-                            <th>@Html.DisplayNameFor(a => a.Interactions.First().OtherSubstanceName)</th>
-                            <th>@Html.DisplayNameFor(a => a.Interactions.First().Interaction)</th>
-                        </tr>
+                    <tr>
+                        <th>@Html.DisplayNameFor(a => a.Interactions.First().OtherSubstanceName)</th>
+                        <th>@Html.DisplayNameFor(a => a.Interactions.First().Interaction)</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        @foreach (var Substance in Model.Interactions)
-                        {
-                            <tr>
-                                <td>@Substance.OtherSubstanceName</td>
-                                <td>@Substance.Interaction</td>
-                            </tr>
-                        }
+                    @foreach (var Substance in Model.Interactions)
+                    {
+                        <tr>
+                            <td>@Substance.OtherSubstanceName</td>
+                            <td>@Substance.Interaction</td>
+                        </tr>
+                    }
                     </tbody>
                 </table>
             </div>
@@ -64,19 +64,19 @@
             <div class="table-responsive">
                 <table class="table table-hover table-bordered align-middle">
                     <thead class="table-light">
-                        <tr>
-                            <th>@Html.DisplayNameFor(a => a.Medications.First().MedName)</th>
-                            <th>@Html.DisplayNameFor(a => a.Medications.First().Strength)</th>
-                        </tr>
+                    <tr>
+                        <th>@Html.DisplayNameFor(a => a.Medications.First().MedName)</th>
+                        <th>@Html.DisplayNameFor(a => a.Medications.First().Strength)</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        @foreach (var Medication in Model.Medications)
-                        {
-                            <tr>
-                                <td>@Medication.MedName</td>
-                                <td>@Medication.Strength</td>
-                            </tr>
-                        }
+                    @foreach (var Medication in Model.Medications)
+                    {
+                        <tr>
+                            <td>@Medication.MedName</td>
+                            <td>@Medication.Strength</td>
+                        </tr>
+                    }
                     </tbody>
                 </table>
             </div>

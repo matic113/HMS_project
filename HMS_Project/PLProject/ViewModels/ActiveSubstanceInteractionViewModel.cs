@@ -6,14 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PLProject.ViewModels
+namespace PLProject.ViewModels;
+
+public class ActiveSubstanceInteractionViewModel
 {
-    public class ActiveSubstanceInteractionViewModel
-    {
-        [Required]
-        public int ActSubId { get; set; }
-        [Required]
-        public string Interaction { get; set; } = null!;
-        public string? OtherSubstanceName { get; set; }
-    }
+    [Required] public int ActSubId { get; set; }
+    [Required] public string Interaction { get; set; } = null!;
+    public string? OtherSubstanceName { get; set; }
 }

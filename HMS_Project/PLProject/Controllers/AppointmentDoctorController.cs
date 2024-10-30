@@ -11,121 +11,125 @@ using PLProject.ViewModels.AppointmentViewModel;
 using PLProject.ViewModels.PrescriptionVM;
 using X.PagedList;
 
-namespace PLProject.Controllers
+namespace PLProject.Controllers;
+
+[Authorize(Roles = Roles.Doctor)]
+public class AppointmentDoctorController : Controller
 {
-	[Authorize(Roles = Roles.Doctor)]
+    #region Dpi
 
-	public class AppointmentDoctorController : Controller
-	{
-		#region Dpi
-		private readonly IUnitOfWork unitOfWork;
-		private readonly IWebHostEnvironment env;
-		private readonly UserManager<AppUser> userManager;
-		private string UserId;
+    private readonly IUnitOfWork unitOfWork;
+    private readonly IWebHostEnvironment env;
+    private readonly UserManager<AppUser> userManager;
+    private string UserId;
 
-		public AppointmentDoctorController(IUnitOfWork unitOfWork, IWebHostEnvironment Env, UserManager<AppUser> UserManager)
-		{
-			this.unitOfWork = unitOfWork;
-			env = Env;
-			userManager = UserManager;
-		} 
-		#endregion
+    public AppointmentDoctorController(IUnitOfWork unitOfWork, IWebHostEnvironment Env,
+        UserManager<AppUser> UserManager)
+    {
+        this.unitOfWork = unitOfWork;
+        env = Env;
+        userManager = UserManager;
+    }
 
-		#region Get all Appointment for Doctor 
-		public async Task<IActionResult> Index(int? page )
-		{
-			// Get the current doctor ID
-			var user = await userManager.GetUserAsync(User);
+    #endregion
 
-			UserId = user?.Id?? string.Empty;
+    #region Get all Appointment for Doctor
 
-			var spec = new BaseSpecification<Apointment>(a => a.DoctorUserId == UserId && /*a.ApointmentDate == DateOnly.FromDateTime(DateTime.Now)*/ /*&&*/ a.ApointmentStatus == ApointmentStatusEnum.Confirmed);
-			spec.Includes.Add(a => a.Patient);
-			spec.Includes.Add(a => a.Doctor);
-			spec.Includes.Add(a => a.Clinic);
+    public async Task<IActionResult> Index(int? page)
+    {
+        // Get the current doctor ID
+        var user = await userManager.GetUserAsync(User);
 
-			var appointments = unitOfWork.Repository<Apointment>().GetALLWithSpec(spec).ToList(); 
+        UserId = user?.Id ?? string.Empty;
 
-			var patientappointments = appointments.Select(app => app.ConvertApointmentToAppointmentGenarelVM());
-			// Pagination logic
-			int pageSize = 10;
-			int pageNumber = page ?? 1;
+        var spec = new BaseSpecification<Apointment>(a =>
+            a.DoctorUserId == UserId && /*a.ApointmentDate == DateOnly.FromDateTime(DateTime.Now)*/ /*&&*/
+            a.ApointmentStatus == ApointmentStatusEnum.Confirmed);
+        spec.Includes.Add(a => a.Patient);
+        spec.Includes.Add(a => a.Doctor);
+        spec.Includes.Add(a => a.Clinic);
 
-			var paginatedList = patientappointments.ToPagedList(pageNumber, pageSize);
+        var appointments = unitOfWork.Repository<Apointment>().GetALLWithSpec(spec).ToList();
 
-			return View(paginatedList);
-		}
+        var patientappointments = appointments.Select(app => app.ConvertApointmentToAppointmentGenarelVM());
+        // Pagination logic
+        var pageSize = 10;
+        var pageNumber = page ?? 1;
 
-		#endregion
+        var paginatedList = patientappointments.ToPagedList(pageNumber, pageSize);
 
-		#region Details
-		public IActionResult Details(int? Id, string viewname = "Details")
-		{
-			if (!Id.HasValue)
-				return BadRequest(); // 400
-			var spec = new BaseSpecification<Apointment>(a => a.Id == Id);
-			spec.Includes.Add(a => a.Patient);
-			spec.Includes.Add(a => a.Doctor);
-			spec.Includes.Add(a => a.Clinic);
-			spec.Includes.Add(a => a.Prescription);
-			var apointment = unitOfWork.Repository<Apointment>().GetEntityWithSpec(spec);
-			var apointmentVM = apointment.ConvertApointmentToAppointmentGenarelVM();
+        return View(paginatedList);
+    }
 
-			if (apointmentVM is null)
-				return NotFound(); // 404
+    #endregion
 
-			return View(viewname, apointmentVM);
+    #region Details
 
-		}
-		#endregion
+    public IActionResult Details(int? Id, string viewname = "Details")
+    {
+        if (!Id.HasValue)
+            return BadRequest(); // 400
+        var spec = new BaseSpecification<Apointment>(a => a.Id == Id);
+        spec.Includes.Add(a => a.Patient);
+        spec.Includes.Add(a => a.Doctor);
+        spec.Includes.Add(a => a.Clinic);
+        spec.Includes.Add(a => a.Prescription);
+        var apointment = unitOfWork.Repository<Apointment>().GetEntityWithSpec(spec);
+        var apointmentVM = apointment.ConvertApointmentToAppointmentGenarelVM();
 
-		#region Edit
-		public IActionResult Edit(int? Id)
-		{
-			return Details(Id, "Edit");
-		}
+        if (apointmentVM is null)
+            return NotFound(); // 404
 
-        [HttpPost, ValidateAntiForgeryToken]
-        public IActionResult Edit([FromRoute] int Id,AppointmentGenarelVM ViewModel)
-		{
+        return View(viewname, apointmentVM);
+    }
 
-            if (Id != ViewModel.Id)
-                return BadRequest();//400
-			// If the model is invalid, repopulate lists and return the view
-            ModelState.Remove<AppointmentGenarelVM>(a => a.PrescriptionViewModel.DoctorUserId);
+    #endregion
 
-            if (!ModelState.IsValid)
-			{
-                return Details(ViewModel.Id, "Edit");
-            }
+    #region Edit
 
-			try
-			{
-                // get the appointment from Repository 
-                var apointment = unitOfWork.Repository<Apointment>().Get(ViewModel.Id);
-				apointment.ConvertAppointmentGenarelVMToApointment(ViewModel);
+    public IActionResult Edit(int? Id)
+    {
+        return Details(Id, "Edit");
+    }
 
-				apointment.ApointmentStatus= ApointmentStatusEnum.Completed;
-				// Update the appointment in the repository
-				unitOfWork.Repository<Apointment>().Update(apointment);
-				unitOfWork.Complete();
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Edit([FromRoute] int Id, AppointmentGenarelVM ViewModel)
+    {
+        if (Id != ViewModel.Id)
+            return BadRequest(); //400
+        // If the model is invalid, repopulate lists and return the view
+        ModelState.Remove<AppointmentGenarelVM>(a => a.PrescriptionViewModel.DoctorUserId);
 
-				// Set a success message using TempData
-				TempData["SuccessMessage"] = "Apointment update successfully!";
+        if (!ModelState.IsValid) return Details(ViewModel.Id, "Edit");
 
-				return RedirectToAction(nameof(Index));
-			}
-			catch (Exception ex)
-			{
-				if (env.IsDevelopment())
-					ModelState.AddModelError(string.Empty, ex.Message);
-				else
-					// Set an error message using TempData
-					TempData["ErrorMessage"] = "An Error Has Occurred during the update.";
+        try
+        {
+            // get the appointment from Repository 
+            var apointment = unitOfWork.Repository<Apointment>().Get(ViewModel.Id);
+            apointment.ConvertAppointmentGenarelVMToApointment(ViewModel);
 
-				return View(ViewModel);
-			}
-		}
-		#endregion
-	}
+            apointment.ApointmentStatus = ApointmentStatusEnum.Completed;
+            // Update the appointment in the repository
+            unitOfWork.Repository<Apointment>().Update(apointment);
+            unitOfWork.Complete();
+
+            // Set a success message using TempData
+            TempData["SuccessMessage"] = "Apointment update successfully!";
+
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            if (env.IsDevelopment())
+                ModelState.AddModelError(string.Empty, ex.Message);
+            else
+                // Set an error message using TempData
+                TempData["ErrorMessage"] = "An Error Has Occurred during the update.";
+
+            return View(ViewModel);
+        }
+    }
+
+    #endregion
 }
